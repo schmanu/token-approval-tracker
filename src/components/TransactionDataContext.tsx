@@ -1,5 +1,9 @@
+import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import React, { ReactElement, useContext, useEffect, useState } from 'react';
+
+import { getAllowance } from '../actions/allowance';
+import { networkInfo } from '../networks';
 
 interface Transaction {
   safe: string;
@@ -30,7 +34,7 @@ interface Transaction {
   };
 }
 
-interface TokenResponse {
+export interface TokenInfo {
   type: string;
   address: string;
   name: string;
@@ -49,27 +53,27 @@ export interface AccumulatedApproval {
 interface TransactionData {
   isLoading: boolean;
   approvalTransactions?: AccumulatedApproval[];
-  tokenInfoMap: Map<string, TokenResponse>;
+  tokenInfoMap: Map<string, TokenInfo>;
 }
 
 const TransactionDataContext = React.createContext<TransactionData>({
   isLoading: true,
   approvalTransactions: new Array<AccumulatedApproval>(),
-  tokenInfoMap: new Map<string, TokenResponse>(),
+  tokenInfoMap: new Map<string, TokenInfo>(),
 });
 
 export const TransactionDataContextProvider = (props: { children: ReactElement; loading: ReactElement }) => {
-  const { safe } = useSafeAppsSDK();
+  const { safe, sdk } = useSafeAppsSDK();
   const [isApprovalLoading, setisApprovalLoading] = useState(false);
   const [isTokenInfoLoading, setisTokenInfoLoading] = useState(false);
   const [approvalTransactions, setApprovalTransactions] = useState<AccumulatedApproval[] | undefined>(undefined);
-  const [tokenInfoMap, setTokenInfoMap] = useState<Map<string, TokenResponse>>(new Map<string, TokenResponse>());
+  const [tokenInfoMap, setTokenInfoMap] = useState<Map<string, TokenInfo>>(new Map<string, TokenInfo>());
 
   useEffect(() => {
     let isMounted = true;
     setisApprovalLoading(true);
 
-    fetchApprovalTransactions(safe.safeAddress)
+    fetchApprovalTransactions(safe.safeAddress, safe.chainId, new SafeAppProvider(safe, sdk))
       .then((approvals) => {
         if (isMounted) {
           setApprovalTransactions(approvals);
@@ -82,20 +86,22 @@ export const TransactionDataContextProvider = (props: { children: ReactElement; 
       isMounted = false;
     };
     return callback;
-  }, [safe.safeAddress]);
+  }, [safe, sdk]);
 
   useEffect(() => {
     let isMounted = true;
     if (approvalTransactions) {
       setisTokenInfoLoading(true);
-      const promisedTokens = approvalTransactions.map((approval) => fetchTokenInfo(approval.tokenAddress));
+      const promisedTokens = approvalTransactions.map((approval) =>
+        fetchTokenInfo(approval.tokenAddress, safe.chainId),
+      );
       Promise.all(promisedTokens)
         .then((tokenResults) => {
-          const entries: [string, TokenResponse][] = (
-            tokenResults.filter((result) => typeof result !== 'undefined') as TokenResponse[]
+          const entries: [string, TokenInfo][] = (
+            tokenResults.filter((result) => typeof result !== 'undefined') as TokenInfo[]
           ).map((result) => [result.address, result]);
           if (isMounted) {
-            setTokenInfoMap(new Map<string, TokenResponse>(entries));
+            setTokenInfoMap(new Map<string, TokenInfo>(entries));
             setisTokenInfoLoading(false);
           }
         })
@@ -106,7 +112,7 @@ export const TransactionDataContextProvider = (props: { children: ReactElement; 
       isMounted = false;
     };
     return callback;
-  }, [approvalTransactions]);
+  }, [approvalTransactions, safe.chainId]);
 
   return (
     <TransactionDataContext.Provider
@@ -140,9 +146,6 @@ export const useTokenList = () => {
 };
 
 const containsApproveTransaction = (tx: Transaction) => {
-  console.log('Contains Approval?');
-  console.log(tx);
-
   const containsApproval =
     'approve' === tx.dataDecoded?.method ||
     ('multiSend' === tx.dataDecoded?.method &&
@@ -155,7 +158,6 @@ const containsApproveTransaction = (tx: Transaction) => {
 };
 
 const unpackApprovalTransactions = (tx: Transaction) => {
-  console.log('Unpacking..');
   const txs: Transaction[] = [];
   if ('approve' === tx.dataDecoded?.method) {
     txs.push(tx);
@@ -179,53 +181,62 @@ const unpackApprovalTransactions = (tx: Transaction) => {
   return txs;
 };
 
-const fetchApprovalTransactions = async (safeAddress: string, offset: number = 0) => {
-  return await fetch(
-    `https://safe-transaction.rinkeby.gnosis.io/api/v1/safes/${safeAddress}/all-transactions/?executed=true&queued=false&limit=50&offset=${offset}`,
-  )
-    .then((response: Response) => {
-      if (response.ok) {
-        return response.json() as Promise<{ results: Transaction[] }>;
-      } else {
-        throw Error(response.statusText);
-      }
-    })
-    .then((response) => response.results)
-    .then((response) => response.filter(containsApproveTransaction))
-    .then((response) => response.flatMap(unpackApprovalTransactions))
-    .then((response) => reduceToMap(response, (obj: Transaction) => obj.to))
-    .then((approvalMap) => {
-      const result: AccumulatedApproval[] = [];
-      for (const tokenEntry of approvalMap.entries()) {
-        const transactionsBySpender = reduceToMap(tokenEntry[1], (tx) => {
-          const spender = tx.dataDecoded?.parameters.find((param) => param.name === 'spender')?.value;
-          if (!spender) {
-            throw Error('Approvals without spender');
-          }
-          return spender;
-        });
+const fetchApprovalTransactions = async (
+  safeAddress: string,
+  network: number,
+  safeAppProvider: SafeAppProvider,
+  offset: number = 0,
+) => {
+  const baseAPIURL = networkInfo.get(network)?.baseAPI;
 
-        for (const spenderEntry of transactionsBySpender.entries()) {
-          const allowance = spenderEntry[1]
-            .find(() => true)
-            ?.dataDecoded?.parameters.find((param) => param.name === 'value')?.value;
-          if (typeof allowance !== 'undefined') {
-            result.push({
-              spender: spenderEntry[0],
-              tokenAddress: tokenEntry[0],
-              allowance,
-              transactions: spenderEntry[1].map((tx) => ({
-                executionDate: tx.executionDate,
-                txHash: tx.transactionHash,
-                value: tx.dataDecoded?.parameters.find((param) => param.name === 'value')?.value,
-              })),
-            });
+  if (!baseAPIURL) {
+    return [] as AccumulatedApproval[];
+  } else {
+    return await fetch(
+      `${baseAPIURL}/safes/${safeAddress}/all-transactions/?executed=true&queued=false&offset=${offset}`,
+    )
+      .then((response: Response) => {
+        if (response.ok) {
+          return response.json() as Promise<{ results: Transaction[] }>;
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .then((response) => response.results)
+      .then((response) => response.filter(containsApproveTransaction))
+      .then((response) => response.flatMap(unpackApprovalTransactions))
+      .then((response) => reduceToMap(response, (obj: Transaction) => obj.to))
+      .then(async (approvalMap) => {
+        const result: AccumulatedApproval[] = [];
+        for (const tokenEntry of approvalMap.entries()) {
+          const transactionsBySpender = reduceToMap(tokenEntry[1], (tx) => {
+            const spender = tx.dataDecoded?.parameters.find((param) => param.name === 'spender')?.value;
+            if (!spender) {
+              throw Error('Approvals without spender');
+            }
+            return spender;
+          });
+
+          for (const spenderEntry of transactionsBySpender.entries()) {
+            const allowance = await getAllowance(safeAddress, tokenEntry[0], spenderEntry[0], safeAppProvider);
+            if (typeof allowance !== 'undefined') {
+              result.push({
+                spender: spenderEntry[0],
+                tokenAddress: tokenEntry[0],
+                allowance: allowance.toFixed(),
+                transactions: spenderEntry[1].map((tx) => ({
+                  executionDate: tx.executionDate,
+                  txHash: tx.transactionHash,
+                  value: tx.dataDecoded?.parameters.find((param) => param.name === 'value')?.value,
+                })),
+              });
+            }
           }
         }
-      }
-      return result;
-    })
-    .catch(() => [] as AccumulatedApproval[]);
+        return result;
+      })
+      .catch(() => [] as AccumulatedApproval[]);
+  }
 };
 
 function reduceToMap<T, K extends string | number>(list: Array<T>, keyFunc: (value: T) => K) {
@@ -236,14 +247,20 @@ function reduceToMap<T, K extends string | number>(list: Array<T>, keyFunc: (val
   }, new Map<K, T[]>());
 }
 
-const fetchTokenInfo = async (tokenAddress: string) => {
-  return await fetch(`https://safe-transaction.rinkeby.gnosis.io/api/v1/tokens/${tokenAddress}/`)
-    .then((response: Response) => {
-      if (response.ok) {
-        return response.json() as Promise<TokenResponse>;
-      } else {
-        throw Error(response.statusText);
-      }
-    })
-    .catch(() => undefined);
+const fetchTokenInfo = async (tokenAddress: string, network: number) => {
+  const baseAPIURL = networkInfo.get(network)?.baseAPI;
+
+  if (!baseAPIURL) {
+    return undefined;
+  } else {
+    return await fetch(`${baseAPIURL}/tokens/${tokenAddress}/`)
+      .then((response: Response) => {
+        if (response.ok) {
+          return response.json() as Promise<TokenInfo>;
+        } else {
+          throw Error(response.statusText);
+        }
+      })
+      .catch(() => undefined);
+  }
 };

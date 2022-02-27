@@ -17,6 +17,7 @@ import styled from 'styled-components';
 import { fromWei } from '../wei';
 
 import { ApprovalDialog } from './ApprovalDialog';
+import { DateDisplay } from './DateDisplay';
 import { useApprovalTransactions, useTokenList } from './TransactionDataContext';
 
 const ColumnGrid = styled.div`
@@ -27,6 +28,9 @@ const ColumnGrid = styled.div`
 
 const AccordionDetailsContainer = styled.div`
   width: 100%;
+  display: flex;
+  padding-right: 28px;
+  flex-direction: column;
   & > div:not(:first-child) p {
     color: #aaa;
     text-decoration: line-through;
@@ -44,6 +48,7 @@ export interface ApprovalEntry {
   tokenAddress: string;
   spender: string;
   amount: BigNumber;
+  listPosition: number;
 }
 
 const UNLIMITED_ALLOWANCE = new BigNumber(
@@ -78,10 +83,14 @@ export const ApprovalList = () => {
               onChange={(event, checked) => {
                 if (checked) {
                   setMarkedForSelection(
-                    approvals?.map((approval) => ({
+                    approvals?.map((approval, idx) => ({
                       tokenAddress: approval.tokenAddress,
-                      amount: fromWei(new BigNumber(approval.allowance), 18),
+                      amount: fromWei(
+                        new BigNumber(approval.allowance),
+                        tokenMap?.get(approval.tokenAddress)?.decimals ?? 18,
+                      ),
                       spender: approval.spender,
+                      listPosition: idx,
                     })) ?? [],
                   );
                 } else {
@@ -108,7 +117,7 @@ export const ApprovalList = () => {
         </FlexRowWrapper>
       </ColumnGrid>
 
-      {approvals?.map((approval) => {
+      {approvals?.map((approval, idx) => {
         const containsApproval = (value: ApprovalEntry) =>
           value.spender === approval.spender && value.tokenAddress === approval.tokenAddress;
         const key = `${approval.tokenAddress};${approval.spender}`;
@@ -128,9 +137,13 @@ export const ApprovalList = () => {
                           setMarkedForSelection([
                             ...markedForSelection,
                             {
-                              amount: fromWei(new BigNumber(approval.allowance), 18),
+                              amount: fromWei(
+                                new BigNumber(approval.allowance),
+                                tokenMap?.get(approval.tokenAddress)?.decimals ?? 18,
+                              ),
                               spender: approval.spender,
                               tokenAddress: approval.tokenAddress,
+                              listPosition: idx,
                             },
                           ]);
                         } else {
@@ -147,18 +160,28 @@ export const ApprovalList = () => {
                     height={24}
                     alt={tokenMap?.get(approval.tokenAddress)?.symbol}
                   />
-                  <EthHashInfo hash={approval.tokenAddress} shortenHash={4} showCopyBtn />
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Text size="lg" strong>
+                      {tokenMap?.get(approval.tokenAddress)?.symbol}
+                    </Text>
+                    <EthHashInfo textSize="sm" hash={approval.tokenAddress} shortenHash={4} showCopyBtn />
+                  </div>
                 </FlexRowWrapper>
                 <FlexRowWrapper>
                   <EthHashInfo hash={approval.spender} shortenHash={4} showAvatar showCopyBtn />
                 </FlexRowWrapper>
                 <FlexRowWrapper>
                   {UNLIMITED_ALLOWANCE.isEqualTo(approval.allowance) ? (
-                    <Text size="md" strong>
+                    <Text size="lg" strong>
                       Unlimited
                     </Text>
                   ) : (
-                    <Text size="md">{fromWei(new BigNumber(approval.allowance), 18).toFixed()}</Text>
+                    <Text size="lg" strong>
+                      {fromWei(
+                        new BigNumber(approval.allowance),
+                        tokenMap?.get(approval.tokenAddress)?.decimals ?? 18,
+                      ).toFixed()}
+                    </Text>
                   )}
                 </FlexRowWrapper>
               </ColumnGrid>
@@ -167,28 +190,33 @@ export const ApprovalList = () => {
               <AccordionDetailsContainer>
                 {approval.transactions.map((tx, idx) => (
                   <>
-                    <ColumnGrid style={{ paddingRight: 28 }}>
+                    <ColumnGrid>
                       <FlexRowWrapper></FlexRowWrapper>
                       <FlexRowWrapper>
-                        <Text size="md" strong>
+                        <Text size="lg" strong>
                           TX hash:
                         </Text>
                         <EthHashInfo hash={tx.txHash} shortenHash={4} showCopyBtn />
                       </FlexRowWrapper>
                       <FlexRowWrapper>
-                        <Text size="md" strong>
-                          Execution date:
+                        <Text size="lg" strong>
+                          Date:
                         </Text>
-                        <Text size="md">{tx.executionDate}</Text>
+                        <DateDisplay isoDate={tx.executionDate} />
                       </FlexRowWrapper>
                       <FlexRowWrapper>
-                        <Text size="md" strong>
+                        <Text size="lg" strong>
                           Amount:
                         </Text>
                         {UNLIMITED_ALLOWANCE.isEqualTo(tx.value ?? 0) ? (
-                          <Text size="md">Unlimited</Text>
+                          <Text size="lg">Unlimited</Text>
                         ) : (
-                          <Text size="md">{fromWei(new BigNumber(tx.value ?? 0), 18).toFixed()}</Text>
+                          <Text size="lg">
+                            {fromWei(
+                              new BigNumber(tx.value ?? 0),
+                              tokenMap?.get(approval.tokenAddress)?.decimals ?? 18,
+                            ).toFixed()}
+                          </Text>
                         )}
                       </FlexRowWrapper>
                     </ColumnGrid>

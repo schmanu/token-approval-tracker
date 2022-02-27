@@ -1,11 +1,12 @@
 import { BaseTransaction } from '@gnosis.pm/safe-apps-sdk';
 import { BigNumber } from 'bignumber.js';
 
+import { TokenInfo } from '../components/TransactionDataContext';
 import { ERC20__factory } from '../contracts';
 import { toWei } from '../wei';
 
 export type ApprovalEdit = {
-  tokenAddress: string;
+  tokenInfo: TokenInfo;
   spenderAddress: string;
   newValue: BigNumber;
 };
@@ -13,11 +14,11 @@ export type ApprovalEdit = {
 export const createApprovals = (approvals: ApprovalEdit[]): BaseTransaction[] => {
   const erc20Interface = ERC20__factory.createInterface();
   const txList = approvals.map((approval) => ({
-    to: approval.tokenAddress,
+    to: approval.tokenInfo.address,
     value: '0',
     data: erc20Interface.encodeFunctionData('approve', [
       approval.spenderAddress,
-      toWei(approval.newValue, 18).toFixed(),
+      toWei(approval.newValue, approval.tokenInfo.decimals).toFixed(),
     ]),
   }));
   return txList;

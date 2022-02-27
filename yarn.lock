@@ -1475,19 +1475,27 @@
     "@ethersproject/properties" "^5.5.0"
     "@ethersproject/strings" "^5.5.0"
 
-"@gnosis.pm/safe-apps-react-sdk@^4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-react-sdk/-/safe-apps-react-sdk-4.1.0.tgz#52d60ba0a9e9594b1df0c7c24e520666566550af"
-  integrity sha512-nkQHLqMVRwmdmXXI2I2zK2+/U+m7yer38hWAt2es7cUeZ5QWaNoRmdNwA8v02WoMpVJDq8/7gtfesYK7dFdLQA==
+"@gnosis.pm/safe-apps-provider@0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-provider/-/safe-apps-provider-0.10.1.tgz#a4cdadc9e398cd60cf83d20a3f8fcc851d9c4106"
+  integrity sha512-h0k0LHuoXmzheGcHbRxM19AOxAsGNzTZiCU5op9xzef9EQOEU/XKY9R8pHwVN6QK1RDTSmNwZQHFzAj+1Dyqhg==
   dependencies:
-    "@gnosis.pm/safe-apps-sdk" "6.2.0"
+    "@gnosis.pm/safe-apps-sdk" "7.0.0"
+    events "^3.3.0"
 
-"@gnosis.pm/safe-apps-sdk@6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-sdk/-/safe-apps-sdk-6.2.0.tgz#05751b4ae4c6cfa7e19839d3655e7d9b5fb72dfe"
-  integrity sha512-dOpVBlu+Nv7bOrOl9llTeRriEpdUnnbXEM/RgTkS1v8Q2swT6+M+WIKTuKB/cadFXbjUsBD/nd3IsihHP24b5g==
+"@gnosis.pm/safe-apps-react-sdk@4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-react-sdk/-/safe-apps-react-sdk-4.2.1.tgz#b4ffbd1b0eb6e6eb66a59f3c1fcd8e47c40efa99"
+  integrity sha512-jsCxfpbcBICTfAReH0A5UNTI2+2ypGKBCU1AY/BksMIaw3QAA46YMWFdmxyrDFWzz3d0WAVbWz0FNRniFGq5Vw==
   dependencies:
-    "@gnosis.pm/safe-react-gateway-sdk" "^2.5.6"
+    "@gnosis.pm/safe-apps-sdk" "7.0.0"
+
+"@gnosis.pm/safe-apps-sdk@7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-sdk/-/safe-apps-sdk-7.0.0.tgz#e2320aca32edbb67d5b9e1e98cbfc448f1cfb2e0"
+  integrity sha512-Is9H7bcdPGh7Wp5oLc17CWbpd5Hi1+KL7z33ClyVP9Sw/s23ApIR7HkXmD5b3XsAW2vSiYfcHNT/yddolvACNg==
+  dependencies:
+    "@gnosis.pm/safe-react-gateway-sdk" "^2.8.5"
     ethers "^5.4.7"
 
 "@gnosis.pm/safe-react-components@^0.9.7":
@@ -1498,10 +1506,10 @@
     react-media "^1.10.0"
     web3-utils "^1.6.0"
 
-"@gnosis.pm/safe-react-gateway-sdk@^2.5.6":
-  version "2.8.5"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-react-gateway-sdk/-/safe-react-gateway-sdk-2.8.5.tgz#3b82b993ae64a5fde1a96a4b0c47a97514839055"
-  integrity sha512-lrZ3gXzbNzIjIzYDs21d7I3fwwHi01YFnD+2+5Kuy0+fJAiONYXih2Z9Q4h3RS/AgzTHfL+G7WB6XB0V8GMVCQ==
+"@gnosis.pm/safe-react-gateway-sdk@^2.8.5":
+  version "2.8.6"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-react-gateway-sdk/-/safe-react-gateway-sdk-2.8.6.tgz#842c1f40ed6bd9164965836d7c4abcfe0a009af2"
+  integrity sha512-XPDOGQtUc1AON/xM4y5mGWMQ/VVaajRXVEdVmKCWOboK0bk1spkuD5oyo9hF0SB3f+lClIagb9PojOurjjWogw==
   dependencies:
     isomorphic-unfetch "^3.1.0"
 
@@ -4837,7 +4845,7 @@ eventemitter3@^4.0.0:
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-4.0.7.tgz#2de9b68f6528d5644ef5c59526a1b4a07306169f"
   integrity sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==
 
-events@^3.2.0:
+events@^3.2.0, events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/events/-/events-3.3.0.tgz#31a95ad0a924e2d2c419a813aeb2c4e878ea7400"
   integrity sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==

@@ -16,7 +16,7 @@ export const getAllowance = async (
     console.log(`Error while fetching decimals: ${error}`);
     return undefined;
   });
-  if (decimals) {
+  if (typeof decimals !== 'undefined') {
     return await contract
       .allowance(ownerAddress, spenderAddress)
       .then((allowance) => allowance.toString())

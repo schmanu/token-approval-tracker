@@ -14,6 +14,7 @@ import { BigNumber } from 'bignumber.js';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+import { UNLIMITED_ALLOWANCE } from '../constants';
 import { fromWei } from '../wei';
 
 import { ApprovalDialog } from './ApprovalDialog';
@@ -50,10 +51,6 @@ export interface ApprovalEntry {
   amount: BigNumber;
   listPosition: number;
 }
-
-const UNLIMITED_ALLOWANCE = new BigNumber(
-  '115792089237316195423570985008687907853269984665640564039457584007913129639935',
-);
 
 export const ApprovalList = () => {
   const approvals = useApprovalTransactions();

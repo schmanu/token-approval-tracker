@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import { createApprovals } from '../actions/approvals';
+import { UNLIMITED_ALLOWANCE } from '../constants';
 import { fromWei, toWei } from '../wei';
 
 import { ApprovalEntry } from './ApprovalList';
@@ -21,10 +22,6 @@ type ApprovalDialogProps = {
   approvals: ApprovalEntry[];
   onCancel: () => void;
 };
-
-const UNLIMITED_ALLOWANCE = new BigNumber(
-  '115792089237316195423570985008687907853269984665640564039457584007913129639935',
-);
 
 const ColumnGrid = styled.div`
   display: grid;

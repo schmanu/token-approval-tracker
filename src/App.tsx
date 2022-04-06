@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 import { ApprovalList } from './components/ApprovalList';
 import { ApprovalLoader } from './components/ApprovalLoader';
-import { TransactionDataContextProvider } from './components/TransactionDataContext';
+import { StoreContextProvider } from './stores/StoreContextProvider';
 
 const Container = styled.div`
   padding: 1rem;
@@ -16,7 +16,7 @@ const Container = styled.div`
 
 const SafeApp = (): React.ReactElement => {
   return (
-    <TransactionDataContextProvider loading={<ApprovalLoader />}>
+    <StoreContextProvider loading={<ApprovalLoader />}>
       <Container>
         <Title size="xl">Token Approval Tracker</Title>
         <Text size="xl">✅ Keep track of all your token approvals.</Text>
@@ -24,7 +24,7 @@ const SafeApp = (): React.ReactElement => {
         <Text size="xl">🔔 Get notified about approvals for malicious contracts.</Text>
         <ApprovalList />
       </Container>
-    </TransactionDataContextProvider>
+    </StoreContextProvider>
   );
 };
 

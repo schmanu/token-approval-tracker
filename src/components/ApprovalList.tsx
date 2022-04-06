@@ -11,15 +11,16 @@ import {
   Title,
 } from '@gnosis.pm/safe-react-components';
 import { BigNumber } from 'bignumber.js';
-import React, { useState } from 'react';
+import { observer } from 'mobx-react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 
 import { UNLIMITED_ALLOWANCE } from '../constants';
+import { StoreContext } from '../stores/StoreContextProvider';
 import { fromWei } from '../wei';
 
 import { ApprovalDialog } from './ApprovalDialog';
 import { DateDisplay } from './DateDisplay';
-import { useApprovalTransactions, useTokenList } from './TransactionDataContext';
 
 const ColumnGrid = styled.div`
   display: grid;
@@ -52,9 +53,10 @@ export interface ApprovalEntry {
   listPosition: number;
 }
 
-export const ApprovalList = () => {
-  const approvals = useApprovalTransactions();
-  const tokenMap = useTokenList();
+export const ApprovalList = observer(() => {
+  const { transactionStore, tokenStore } = useContext(StoreContext);
+  const approvals = transactionStore.approvalTransactions;
+  const tokenMap = tokenStore.tokenInfoMap;
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
 
   const [markedForSelection, setMarkedForSelection] = useState([] as ApprovalEntry[]);
@@ -241,4 +243,4 @@ export const ApprovalList = () => {
       )}
     </Card>
   );
-};
+});

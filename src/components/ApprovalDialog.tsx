@@ -1,15 +1,15 @@
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { Button, EthHashInfo, GenericModal, TextFieldInput, Text, Checkbox } from '@gnosis.pm/safe-react-components';
 import BigNumber from 'bignumber.js';
-import { useCallback, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 
 import { createApprovals } from '../actions/approvals';
 import { UNLIMITED_ALLOWANCE } from '../constants';
+import { StoreContext } from '../stores/StoreContextProvider';
 import { fromWei, toWei } from '../wei';
 
 import { ApprovalEntry } from './ApprovalList';
-import { useTokenList } from './TransactionDataContext';
 
 interface EditableApprovalEntry {
   amount: string;
@@ -37,7 +37,7 @@ const FlexRowWrapper = styled.div`
 `;
 
 export const ApprovalDialog = (props: ApprovalDialogProps) => {
-  const tokenMap = useTokenList();
+  const { tokenInfoMap } = useContext(StoreContext).tokenStore;
   const { approvals } = props;
 
   const [success, setSuccess] = useState(false);
@@ -60,7 +60,7 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
   const submitDialog = useCallback(async () => {
     const txs = createApprovals(
       approvalEntries.map((entry) => {
-        const tokenInfo = tokenMap?.get(entry.tokenAddress);
+        const tokenInfo = tokenInfoMap?.get(entry.tokenAddress);
         if (!tokenInfo) {
           throw new Error(`No TokenInfo found for token with address: ${entry.tokenAddress}`);
         } else {
@@ -76,7 +76,7 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
     if (response?.safeTxHash) {
       setSuccess(true);
     }
-  }, [approvalEntries, sdk.txs, tokenMap]);
+  }, [approvalEntries, sdk.txs, tokenInfoMap]);
 
   return (
     <GenericModal
@@ -87,16 +87,16 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
           {!success ? (
             <div>
               {approvalEntries.map((approval) => {
-                const decimals = tokenMap?.get(approval.tokenAddress)?.decimals ?? 18;
+                const decimals = tokenInfoMap?.get(approval.tokenAddress)?.decimals ?? 18;
                 const amountInDecimals = new BigNumber(approval.amount);
                 return (
                   <ColumnGrid>
                     <FlexRowWrapper>
                       <img
-                        src={tokenMap?.get(approval.tokenAddress)?.logoUri}
+                        src={tokenInfoMap?.get(approval.tokenAddress)?.logoUri}
                         width={24}
                         height={24}
-                        alt={tokenMap?.get(approval.tokenAddress)?.symbol}
+                        alt={tokenInfoMap?.get(approval.tokenAddress)?.symbol}
                       />
                       <EthHashInfo hash={approval.tokenAddress} shortenHash={4} showCopyBtn />
                     </FlexRowWrapper>

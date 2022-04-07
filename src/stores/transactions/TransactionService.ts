@@ -1,4 +1,11 @@
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
+import {
+  DataDecoded,
+  getTransactionDetails,
+  getTransactionHistory,
+  TransactionDetails,
+  TransactionListItem,
+} from '@gnosis.pm/safe-react-gateway-sdk';
 
 import { getAllowance } from '../../actions/allowance';
 import { networkInfo } from '../../networks';
@@ -6,67 +13,65 @@ import { TokenInfo } from '../tokens/TokenStore';
 
 import { AccumulatedApproval } from './TransactionStore';
 
+const baseAPI = 'https://safe-client.gnosis.io';
 interface Transaction {
-  safe: string;
   to: string;
-  transactionHash: string;
-  executionDate: string;
-  dataDecoded?: {
-    method: string;
-    parameters: Array<{
-      name: string;
-      type: string;
-      value: string;
-      valueDecoded?: {
-        operation: number;
-        to: string;
-        value: string;
-        data: string;
-        dataDecoded?: {
-          method: string;
-          parameters: {
-            name: string;
-            type: string;
-            value: string;
-          }[];
-        };
-      }[];
-    }>;
-  };
+  transactionHash: string | null;
+  executionDate: number | null;
+  dataDecoded?: DataDecoded;
 }
 
-const containsApproveTransaction = (tx: Transaction) => {
+const approveAndMultiSendTransactions = (tx: TransactionListItem) =>
+  tx.type === 'TRANSACTION' &&
+  tx.transaction.txInfo.type === 'Custom' &&
+  (tx.transaction.txInfo.methodName === 'multiSend' || tx.transaction.txInfo.methodName === 'approve');
+
+const containsApproveTransaction = (tx: TransactionDetails | undefined): tx is TransactionDetails => {
+  const dataDecoded = tx?.txData?.dataDecoded;
   const containsApproval =
-    'approve' === tx.dataDecoded?.method ||
-    ('multiSend' === tx.dataDecoded?.method &&
-      (tx.dataDecoded.parameters
-        .find((param) => param.name === 'transactions')
+    'approve' === dataDecoded?.method ||
+    ('multiSend' === dataDecoded?.method &&
+      (dataDecoded?.parameters
+        ?.find((param) => param.name === 'transactions')
         ?.valueDecoded?.some((value) => value.dataDecoded?.method === 'approve') ??
         false));
   return containsApproval;
 };
 
-const unpackApprovalTransactions = (tx: Transaction) => {
+const unpackApprovalTransactions = (tx: TransactionDetails) => {
   const txs: Transaction[] = [];
-  if ('approve' === tx.dataDecoded?.method) {
-    txs.push(tx);
-  } else {
-    tx.dataDecoded?.parameters
-      .find((param) => param.name === 'transactions')
-      ?.valueDecoded?.forEach((innerTx) => {
-        if (innerTx.dataDecoded?.method === 'approve') {
-          txs.push({
-            executionDate: tx.executionDate,
-            safe: tx.safe,
-            to: innerTx.to,
-            transactionHash: tx.transactionHash,
-            dataDecoded: innerTx.dataDecoded,
-          });
-        }
+  if (tx.txInfo.type === 'Custom') {
+    if ('approve' === tx.txData?.dataDecoded?.method) {
+      txs.push({
+        executionDate: tx.executedAt,
+        to: tx.txData.to.value,
+        transactionHash: tx.txHash,
+        dataDecoded: tx.txData.dataDecoded,
       });
+    } else {
+      tx.txData?.dataDecoded?.parameters
+        ?.find((param) => param.name === 'transactions')
+        ?.valueDecoded?.forEach((innerTx) => {
+          if (innerTx.dataDecoded?.method === 'approve') {
+            txs.push({
+              executionDate: tx.executedAt,
+              to: innerTx.to,
+              transactionHash: tx.txHash,
+              dataDecoded: innerTx.dataDecoded,
+            });
+          }
+        });
+    }
   }
 
   return txs;
+};
+
+const fetchTransactionDetails = async (tx: TransactionListItem, chainID: string) => {
+  if (tx.type === 'TRANSACTION') {
+    return await getTransactionDetails(baseAPI, chainID, tx.transaction.id).catch(() => undefined);
+  }
+  return undefined;
 };
 
 export const fetchApprovalTransactions = async (
@@ -80,17 +85,12 @@ export const fetchApprovalTransactions = async (
   if (!baseAPIURL) {
     return [] as AccumulatedApproval[];
   } else {
-    return await fetch(
-      `${baseAPIURL}/safes/${safeAddress}/all-transactions/?executed=true&queued=false&offset=${offset}`,
-    )
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json() as Promise<{ results: Transaction[] }>;
-        } else {
-          throw Error(response.statusText);
-        }
-      })
+    const transactionsWithDetails = await getTransactionHistory(baseAPI, `${network}`, safeAddress)
       .then((response) => response.results)
+      .then((response) => response.filter(approveAndMultiSendTransactions))
+      .then((response) => response.map((tx) => fetchTransactionDetails(tx, `${network}`)));
+
+    return Promise.all(transactionsWithDetails)
       .then((response) => response.filter(containsApproveTransaction))
       .then((response) => response.flatMap(unpackApprovalTransactions))
       .then((response) => reduceToMap(response, (obj: Transaction) => obj.to))
@@ -98,7 +98,7 @@ export const fetchApprovalTransactions = async (
         const result: AccumulatedApproval[] = [];
         for (const tokenEntry of approvalMap.entries()) {
           const transactionsBySpender = reduceToMap(tokenEntry[1], (tx) => {
-            const spender = tx.dataDecoded?.parameters.find((param) => param.name === 'spender')?.value;
+            const spender = tx.dataDecoded?.parameters?.find((param) => param.name === 'spender')?.value as string;
             if (!spender) {
               throw Error('Approvals without spender');
             }
@@ -115,7 +115,7 @@ export const fetchApprovalTransactions = async (
                 transactions: spenderEntry[1].map((tx) => ({
                   executionDate: tx.executionDate,
                   txHash: tx.transactionHash,
-                  value: tx.dataDecoded?.parameters.find((param) => param.name === 'value')?.value,
+                  value: tx.dataDecoded?.parameters?.find((param) => param.name === 'value')?.value as string,
                 })),
               });
             }

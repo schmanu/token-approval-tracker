@@ -3,11 +3,16 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { fetchApprovalTransactions } from './TransactionService';
 
+export interface Transaction {
+  executionDate: number | null;
+  value?: string;
+  txHash: string | null;
+}
 export interface AccumulatedApproval {
   tokenAddress: string;
   spender: string;
   allowance: string;
-  transactions: { executionDate: string; value?: string; txHash: string }[];
+  transactions: Transaction[];
 }
 
 export class TransactionStore {

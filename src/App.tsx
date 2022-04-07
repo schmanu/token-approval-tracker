@@ -2,9 +2,12 @@ import { Title, Text } from '@gnosis.pm/safe-react-components';
 import React from 'react';
 import styled from 'styled-components';
 
-import { ApprovalList } from './components/ApprovalList';
 import { ApprovalLoader } from './components/ApprovalLoader';
-import { TransactionDataContextProvider } from './components/TransactionDataContext';
+import { ApprovalList } from './components/approvallist/ApprovalList';
+import { StoreContextProvider } from './stores/StoreContextProvider';
+import { TokenStore } from './stores/tokens/TokenStore';
+import { TransactionStore } from './stores/transactions/TransactionStore';
+import { UIStore } from './stores/ui/UIStore';
 
 const Container = styled.div`
   padding: 1rem;
@@ -14,9 +17,15 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
+const tokenStore = new TokenStore();
+
+const transactionStore = new TransactionStore();
+
+const uiStore = new UIStore();
+
 const SafeApp = (): React.ReactElement => {
   return (
-    <TransactionDataContextProvider loading={<ApprovalLoader />}>
+    <StoreContextProvider stores={{ tokenStore, transactionStore, uiStore }} loading={<ApprovalLoader />}>
       <Container>
         <Title size="xl">Token Approval Tracker</Title>
         <Text size="xl">✅ Keep track of all your token approvals.</Text>
@@ -24,7 +33,7 @@ const SafeApp = (): React.ReactElement => {
         <Text size="xl">🔔 Get notified about approvals for malicious contracts.</Text>
         <ApprovalList />
       </Container>
-    </TransactionDataContextProvider>
+    </StoreContextProvider>
   );
 };
 

@@ -1,9 +1,10 @@
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import React, { ReactElement, useContext, useEffect, useState } from 'react';
 
-import { getAllowance } from '../actions/allowance';
-import { networkInfo } from '../networks';
+import { getAllowance } from '../../actions/allowance';
+import { networkInfo } from '../../networks';
+import { TokenInfo } from '../tokens/TokenStore';
+
+import { AccumulatedApproval } from './TransactionStore';
 
 interface Transaction {
   safe: string;
@@ -34,117 +35,6 @@ interface Transaction {
   };
 }
 
-export interface TokenInfo {
-  type: string;
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  logoUri: string;
-}
-
-export interface AccumulatedApproval {
-  tokenAddress: string;
-  spender: string;
-  allowance: string;
-  transactions: { executionDate: string; value?: string; txHash: string }[];
-}
-
-interface TransactionData {
-  isLoading: boolean;
-  approvalTransactions?: AccumulatedApproval[];
-  tokenInfoMap: Map<string, TokenInfo>;
-}
-
-const TransactionDataContext = React.createContext<TransactionData>({
-  isLoading: true,
-  approvalTransactions: new Array<AccumulatedApproval>(),
-  tokenInfoMap: new Map<string, TokenInfo>(),
-});
-
-export const TransactionDataContextProvider = (props: { children: ReactElement; loading: ReactElement }) => {
-  const { safe, sdk } = useSafeAppsSDK();
-  const [isApprovalLoading, setisApprovalLoading] = useState(false);
-  const [isTokenInfoLoading, setisTokenInfoLoading] = useState(false);
-  const [approvalTransactions, setApprovalTransactions] = useState<AccumulatedApproval[] | undefined>(undefined);
-  const [tokenInfoMap, setTokenInfoMap] = useState<Map<string, TokenInfo>>(new Map<string, TokenInfo>());
-
-  useEffect(() => {
-    let isMounted = true;
-    setisApprovalLoading(true);
-
-    fetchApprovalTransactions(safe.safeAddress, safe.chainId, new SafeAppProvider(safe, sdk))
-      .then((approvals) => {
-        if (isMounted) {
-          setApprovalTransactions(approvals);
-          setisApprovalLoading(false);
-        }
-      })
-      .catch(() => isMounted ?? setisApprovalLoading(false));
-
-    const callback = () => {
-      isMounted = false;
-    };
-    return callback;
-  }, [safe, sdk]);
-
-  useEffect(() => {
-    let isMounted = true;
-    if (approvalTransactions) {
-      setisTokenInfoLoading(true);
-      const promisedTokens = approvalTransactions.map((approval) =>
-        fetchTokenInfo(approval.tokenAddress, safe.chainId),
-      );
-      Promise.all(promisedTokens)
-        .then((tokenResults) => {
-          const entries: [string, TokenInfo][] = (
-            tokenResults.filter((result) => typeof result !== 'undefined') as TokenInfo[]
-          ).map((result) => [result.address, result]);
-          if (isMounted) {
-            setTokenInfoMap(new Map<string, TokenInfo>(entries));
-            setisTokenInfoLoading(false);
-          }
-        })
-        .catch(() => isMounted ?? setisTokenInfoLoading(false));
-    }
-
-    const callback = () => {
-      isMounted = false;
-    };
-    return callback;
-  }, [approvalTransactions, safe.chainId]);
-
-  return (
-    <TransactionDataContext.Provider
-      value={{
-        isLoading: isApprovalLoading || isTokenInfoLoading,
-        approvalTransactions,
-        tokenInfoMap,
-      }}
-    >
-      {isApprovalLoading || isTokenInfoLoading ? props.loading : props.children}
-    </TransactionDataContext.Provider>
-  );
-};
-
-export const useApprovalTransactions = () => {
-  const { isLoading, approvalTransactions } = useContext(TransactionDataContext);
-  if (!isLoading) {
-    return approvalTransactions;
-  } else {
-    return undefined;
-  }
-};
-
-export const useTokenList = () => {
-  const { isLoading, tokenInfoMap } = useContext(TransactionDataContext);
-  if (!isLoading) {
-    return tokenInfoMap;
-  } else {
-    return undefined;
-  }
-};
-
 const containsApproveTransaction = (tx: Transaction) => {
   const containsApproval =
     'approve' === tx.dataDecoded?.method ||
@@ -153,7 +43,6 @@ const containsApproveTransaction = (tx: Transaction) => {
         .find((param) => param.name === 'transactions')
         ?.valueDecoded?.some((value) => value.dataDecoded?.method === 'approve') ??
         false));
-  console.log('Check DOne');
   return containsApproval;
 };
 
@@ -162,7 +51,6 @@ const unpackApprovalTransactions = (tx: Transaction) => {
   if ('approve' === tx.dataDecoded?.method) {
     txs.push(tx);
   } else {
-    console.log('Trying to unpack multisend tx: ' + tx);
     tx.dataDecoded?.parameters
       .find((param) => param.name === 'transactions')
       ?.valueDecoded?.forEach((innerTx) => {
@@ -181,7 +69,7 @@ const unpackApprovalTransactions = (tx: Transaction) => {
   return txs;
 };
 
-const fetchApprovalTransactions = async (
+export const fetchApprovalTransactions = async (
   safeAddress: string,
   network: number,
   safeAppProvider: SafeAppProvider,
@@ -247,7 +135,7 @@ function reduceToMap<T, K extends string | number>(list: Array<T>, keyFunc: (val
   }, new Map<K, T[]>());
 }
 
-const fetchTokenInfo = async (tokenAddress: string, network: number) => {
+export const fetchTokenInfo = async (tokenAddress: string, network: number) => {
   const baseAPIURL = networkInfo.get(network)?.baseAPI;
 
   if (!baseAPIURL) {

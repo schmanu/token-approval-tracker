@@ -1,14 +1,12 @@
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { Button, EthHashInfo, GenericModal, TextFieldInput, Text, Checkbox } from '@gnosis.pm/safe-react-components';
+import { Button, EthHashInfo, GenericModal, TextFieldInput, Text, Select } from '@gnosis.pm/safe-react-components';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 
 import { createApprovals } from '../actions/approvals';
-import { UNLIMITED_ALLOWANCE } from '../constants';
 import { StoreContext } from '../stores/StoreContextProvider';
-import { fromWei, toWei } from '../wei';
 
 type ApprovalDialogProps = {
   onCancel: () => void;
@@ -37,28 +35,16 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
 
   const { sdk } = useSafeAppsSDK();
 
+  console.log('Rendering Dialog');
   // Convert props to proper data structure
 
   const submitDialog = useCallback(async () => {
-    const txs = createApprovals(
-      approvals.map((entry) => {
-        const tokenInfo = tokenInfoMap?.get(entry.tokenAddress);
-        if (!tokenInfo) {
-          throw new Error(`No TokenInfo found for token with address: ${entry.tokenAddress}`);
-        } else {
-          return {
-            newValue: new BigNumber(entry.editedAmount),
-            spenderAddress: entry.spender,
-            tokenInfo: tokenInfo,
-          };
-        }
-      }),
-    );
+    const txs = createApprovals(approvals);
     const response = await sdk.txs.send({ txs: txs }).catch(() => undefined);
     if (response?.safeTxHash) {
       setSuccess(true);
     }
-  }, [approvals, sdk.txs, tokenInfoMap]);
+  }, [approvals, sdk.txs]);
 
   return (
     <GenericModal
@@ -69,7 +55,6 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
           {!success ? (
             <div>
               {approvals.map((approval) => {
-                const decimals = tokenInfoMap?.get(approval.tokenAddress)?.decimals ?? 18;
                 const amountInDecimals = new BigNumber(approval.editedAmount);
                 return (
                   <ColumnGrid>
@@ -86,31 +71,38 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                       <EthHashInfo hash={approval.spender} shortenHash={4} showCopyBtn />
                     </FlexRowWrapper>
                     <FlexRowWrapper>
-                      <Checkbox
-                        checked={UNLIMITED_ALLOWANCE.isEqualTo(toWei(approval.editedAmount, decimals))}
-                        label="No Limit"
-                        name="unlimited"
-                        onChange={(event, checked) => {
-                          const newAmount = checked
-                            ? fromWei(UNLIMITED_ALLOWANCE, decimals)
-                            : UNLIMITED_ALLOWANCE.isEqualTo(toWei(approval.currentAmount, decimals))
-                            ? new BigNumber('0')
-                            : approval.currentAmount;
-
-                          approval.setEditedAmount(newAmount);
+                      <Select
+                        items={[
+                          {
+                            id: 'revoke',
+                            label: 'Revoke',
+                          },
+                          {
+                            id: 'unlimited',
+                            label: 'Unlimited',
+                          },
+                          {
+                            id: 'custom',
+                            label: 'Custom',
+                          },
+                        ]}
+                        activeItemId={approval.inputMode}
+                        onItemClick={(id) => {
+                          approval.setInputMode(id as 'revoke' | 'unlimited' | 'custom');
                         }}
                       />
                       <TextFieldInput
                         name="amount"
+                        disabled={approval.inputMode !== 'custom'}
                         inputMode="decimal"
                         placeholder="Amount"
                         label="Approval Amount"
-                        variant="standard"
+                        variant="outlined"
                         value={approval.editedAmount}
                         error={amountInDecimals.isNaN() ? 'The value must be a number!' : undefined}
                         onChange={(event) => {
                           const newValue = event.target.value;
-                          approval.setEditedAmount(new BigNumber(newValue));
+                          approval.setEditedAmount(newValue);
                         }}
                       ></TextFieldInput>
                     </FlexRowWrapper>

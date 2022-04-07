@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { action, computed, makeObservable, observable } from 'mobx';
 
+import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { fromWei, toWei } from '../../wei';
 import { AccumulatedApproval } from '../transactions/TransactionStore';
 
@@ -10,7 +11,8 @@ export class UIApprovalEntry {
   /* The currently given approval*/
   currentAmount: BigNumber;
   /* The approval edited by the user */
-  editedAmount: BigNumber;
+  editedAmount: string;
+  inputMode: 'custom' | 'unlimited' | 'revoke';
   selected: boolean;
   decimals: number;
   transactions: { executionDate: string; value?: string; txHash: string }[];
@@ -19,10 +21,11 @@ export class UIApprovalEntry {
     this.tokenAddress = approval.tokenAddress;
     this.spender = approval.spender;
     this.currentAmount = fromWei(new BigNumber(approval.allowance), decimals);
-    this.editedAmount = this.currentAmount;
+    this.editedAmount = this.currentAmount.toFixed();
     this.selected = false;
     this.decimals = decimals;
     this.transactions = approval.transactions;
+    this.inputMode = UNLIMITED_ALLOWANCE.isEqualTo(approval.allowance) ? 'unlimited' : 'custom';
 
     makeObservable(this, {
       tokenAddress: observable,
@@ -30,10 +33,12 @@ export class UIApprovalEntry {
       currentAmount: observable,
       editedAmount: observable,
       selected: observable,
+      inputMode: observable,
       id: computed,
       toggleSelected: action,
       setSelected: action,
       setEditedAmount: action,
+      setInputMode: action,
       currentAmountInWEI: computed,
       editedAmountInWEI: computed,
     });
@@ -59,8 +64,22 @@ export class UIApprovalEntry {
     this.selected = selected;
   };
 
-  setEditedAmount = (editedAmount: BigNumber) => {
+  setEditedAmount = (editedAmount: string) => {
     this.editedAmount = editedAmount;
+  };
+
+  setInputMode = (inputMode: 'custom' | 'unlimited' | 'revoke') => {
+    this.inputMode = inputMode;
+    switch (inputMode) {
+      case 'custom':
+        break;
+      case 'revoke':
+        this.editedAmount = '0';
+        break;
+      case 'unlimited':
+        this.editedAmount = fromWei(UNLIMITED_ALLOWANCE, this.decimals).toFixed();
+        break;
+    }
   };
 }
 

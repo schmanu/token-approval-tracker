@@ -23,6 +23,10 @@ const GlobalStyle = createGlobalStyle`
         width: 100% !important;
     }
 
+    .MuiSelect-root div p {
+        font-size: 14px;
+    }
+
     @font-face {
         font-family: 'Averta';
         src: local('Averta'), local('Averta Bold'),

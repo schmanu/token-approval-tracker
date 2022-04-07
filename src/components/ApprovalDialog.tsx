@@ -16,6 +16,7 @@ const ColumnGrid = styled.div`
   display: grid;
   grid-template-columns: 3fr 3fr 3fr;
   width: 100%;
+  padding-bottom: 8px;
 `;
 
 const FlexRowWrapper = styled.div`
@@ -23,6 +24,8 @@ const FlexRowWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 4px;
+  padding: 8px 0px;
+  border-bottom: 1px solid #ddd;
 `;
 
 export const ApprovalDialog = observer((props: ApprovalDialogProps) => {

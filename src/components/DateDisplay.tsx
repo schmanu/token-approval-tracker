@@ -25,7 +25,6 @@ const YearField = styled.p``;
 export const DateDisplay = (props: DateDisplayProps) => {
   const { isoDate } = props;
   const date = new Date(isoDate);
-  console.log('rerender Date');
 
   return (
     <Wrapper>

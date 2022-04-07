@@ -43,7 +43,6 @@ const containsApproveTransaction = (tx: Transaction) => {
         .find((param) => param.name === 'transactions')
         ?.valueDecoded?.some((value) => value.dataDecoded?.method === 'approve') ??
         false));
-  console.log('Check DOne');
   return containsApproval;
 };
 
@@ -52,7 +51,6 @@ const unpackApprovalTransactions = (tx: Transaction) => {
   if ('approve' === tx.dataDecoded?.method) {
     txs.push(tx);
   } else {
-    console.log('Trying to unpack multisend tx: ' + tx);
     tx.dataDecoded?.parameters
       .find((param) => param.name === 'transactions')
       ?.valueDecoded?.forEach((innerTx) => {

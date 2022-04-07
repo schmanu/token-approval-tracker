@@ -21,11 +21,11 @@ export class UIApprovalEntry {
     this.tokenAddress = approval.tokenAddress;
     this.spender = approval.spender;
     this.currentAmount = fromWei(new BigNumber(approval.allowance), decimals);
-    this.editedAmount = this.currentAmount.toFixed();
+    this.editedAmount = '0';
     this.selected = false;
     this.decimals = decimals;
     this.transactions = approval.transactions;
-    this.inputMode = UNLIMITED_ALLOWANCE.isEqualTo(approval.allowance) ? 'unlimited' : 'custom';
+    this.inputMode = 'revoke';
 
     makeObservable(this, {
       tokenAddress: observable,

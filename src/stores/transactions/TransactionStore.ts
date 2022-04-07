@@ -24,8 +24,6 @@ export class TransactionStore {
   }
 
   fetchApprovals = (safeAddress: string, chainId: number, web3Provider: SafeAppProvider) => {
-    console.log('fetchApprovals');
-
     fetchApprovalTransactions(safeAddress, chainId, web3Provider)
       .then((approvals) => this.setApprovalTransactions(approvals))
       .catch(() => this.setApprovalTransactions([]));

@@ -13,7 +13,6 @@ export const ApprovalList = observer(() => {
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
 
   const approvals = uiStore.approvals;
-  console.log('Approval List renders');
   return (
     <Card>
       <ApprovalHeader />

@@ -51,7 +51,6 @@ export const StoreContextProvider = (props: {
   reaction(
     () => transactionStore.approvalTransactions,
     (approvals) => {
-      console.log('Reacting to approval changes!');
       tokenStore.loadTokenInfo(approvals, safe.chainId);
     },
   );

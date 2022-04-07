@@ -35,9 +35,6 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
 
   const { sdk } = useSafeAppsSDK();
 
-  console.log('Rendering Dialog');
-  // Convert props to proper data structure
-
   const submitDialog = useCallback(async () => {
     const txs = createApprovals(approvals);
     const response = await sdk.txs.send({ txs: txs }).catch(() => undefined);
@@ -100,6 +97,7 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                         variant="outlined"
                         value={approval.editedAmount}
                         error={amountInDecimals.isNaN() ? 'The value must be a number!' : undefined}
+                        onFocus={(event) => event.target.select()}
                         onChange={(event) => {
                           const newValue = event.target.value;
                           approval.setEditedAmount(newValue);

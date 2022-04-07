@@ -1,9 +1,10 @@
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
 
 import { getAllowance } from '../../actions/allowance';
-import { AccumulatedApproval } from '../../components/TransactionDataContext';
 import { networkInfo } from '../../networks';
-import { TokenInfo } from '../tokens/TokenService';
+import { TokenInfo } from '../tokens/TokenStore';
+
+import { AccumulatedApproval } from './TransactionStore';
 
 interface Transaction {
   safe: string;

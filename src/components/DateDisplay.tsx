@@ -25,6 +25,7 @@ const YearField = styled.p``;
 export const DateDisplay = (props: DateDisplayProps) => {
   const { isoDate } = props;
   const date = new Date(isoDate);
+  console.log('rerender Date');
 
   return (
     <Wrapper>
@@ -32,7 +33,7 @@ export const DateDisplay = (props: DateDisplayProps) => {
       <MonthField>{MONTH_NAMES[date.getMonth()]}</MonthField>
       <YearField>{date.getFullYear()}</YearField>
       <p>-</p>
-      <TimeField>{`${date.getHours()}:${date.getMinutes()}`}</TimeField>
+      <TimeField>{`${date.getHours()}:${date.getMinutes() < 10 ? 0 : ''}${date.getMinutes()}`}</TimeField>
     </Wrapper>
   );
 };

@@ -1,9 +1,17 @@
 import { action, makeObservable, observable } from 'mobx';
 
-import { AccumulatedApproval } from '../../components/TransactionDataContext';
+import { AccumulatedApproval } from '../transactions/TransactionStore';
 
-import { fetchTokenInfo, TokenInfo } from './TokenService';
+import { fetchTokenInfo } from './TokenService';
 
+export interface TokenInfo {
+  type: string;
+  address: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  logoUri: string;
+}
 export class TokenStore {
   isTokenDataLoading = true;
   tokenInfoMap: Map<string, TokenInfo> = new Map();

@@ -1,8 +1,8 @@
 import { BaseTransaction } from '@gnosis.pm/safe-apps-sdk';
 import { BigNumber } from 'bignumber.js';
 
-import { TokenInfo } from '../components/TransactionDataContext';
 import { ERC20__factory } from '../contracts';
+import { TokenInfo } from '../stores/tokens/TokenStore';
 import { toWei } from '../wei';
 
 export type ApprovalEdit = {

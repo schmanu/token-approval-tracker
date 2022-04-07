@@ -1,13 +1,19 @@
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { reaction } from 'mobx';
-import { observer } from 'mobx-react';
-import { createContext, ReactElement, useEffect, useState } from 'react';
+import { observable, reaction } from 'mobx';
+import { createContext, ReactElement, useEffect } from 'react';
+
+import { StoreLoader } from '../components/StoreLoader';
 
 import { TokenStore } from './tokens/TokenStore';
 import { TransactionStore } from './transactions/TransactionStore';
+import { UIApprovalEntry, UIStore } from './ui/UIStore';
 
-export const StoreContext = createContext<{ transactionStore: TransactionStore; tokenStore: TokenStore }>({
+export const StoreContext = createContext<{
+  transactionStore: TransactionStore;
+  tokenStore: TokenStore;
+  uiStore: UIStore;
+}>({
   transactionStore: {
     approvalTransactions: [],
     fetchApprovals: () => {},
@@ -20,17 +26,24 @@ export const StoreContext = createContext<{ transactionStore: TransactionStore; 
     setTokenInfo: (map) => {},
     tokenInfoMap: new Map(),
   },
+  uiStore: {
+    approvals: observable([]),
+    setApprovals: () => {},
+    allSelected: false,
+    selectAll: () => {},
+    selectedApprovals: [],
+  },
 });
 
-export const StoreContextProvider = observer((props: { children: ReactElement; loading: ReactElement }) => {
+export const StoreContextProvider = (props: {
+  children: ReactElement;
+  loading: ReactElement;
+  stores: { transactionStore: TransactionStore; tokenStore: TokenStore; uiStore: UIStore };
+}) => {
   const { safe, sdk } = useSafeAppsSDK();
-  const [transactionStore] = useState(new TransactionStore());
-
-  const [tokenStore] = useState(new TokenStore());
+  const { transactionStore, tokenStore, uiStore } = props.stores;
 
   const { fetchApprovals } = transactionStore;
-  const { loadTokenInfo } = tokenStore;
-
   useEffect(() => {
     fetchApprovals(safe.safeAddress, safe.chainId, new SafeAppProvider(safe, sdk));
   }, [fetchApprovals, safe, sdk]);
@@ -39,13 +52,30 @@ export const StoreContextProvider = observer((props: { children: ReactElement; l
     () => transactionStore.approvalTransactions,
     (approvals) => {
       console.log('Reacting to approval changes!');
-      loadTokenInfo(approvals, safe.chainId);
+      tokenStore.loadTokenInfo(approvals, safe.chainId);
+    },
+  );
+
+  reaction(
+    () => ({ tokenInfoMap: tokenStore.tokenInfoMap, approvalTransactions: transactionStore.approvalTransactions }),
+    (data) => {
+      const { tokenInfoMap, approvalTransactions } = data;
+      const uiApprovals = approvalTransactions
+        .map((approval) => {
+          const decimals = tokenInfoMap.get(approval.tokenAddress)?.decimals;
+          if (typeof decimals !== 'undefined') {
+            return new UIApprovalEntry(approval, decimals);
+          }
+          return undefined;
+        })
+        .filter((value) => typeof value !== 'undefined') as UIApprovalEntry[];
+      uiStore.setApprovals(uiApprovals);
     },
   );
 
   return (
-    <StoreContext.Provider value={{ transactionStore, tokenStore }}>
-      {transactionStore.isTransactionDataLoading || tokenStore.isTokenDataLoading ? props.loading : props.children}
+    <StoreContext.Provider value={{ transactionStore, tokenStore, uiStore }}>
+      <StoreLoader {...props} />
     </StoreContext.Provider>
   );
-});
+};

@@ -1,6 +1,7 @@
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { Button, EthHashInfo, GenericModal, TextFieldInput, Text, Checkbox } from '@gnosis.pm/safe-react-components';
 import BigNumber from 'bignumber.js';
+import { observer } from 'mobx-react';
 import { useCallback, useContext, useState } from 'react';
 import styled from 'styled-components';
 
@@ -9,17 +10,7 @@ import { UNLIMITED_ALLOWANCE } from '../constants';
 import { StoreContext } from '../stores/StoreContextProvider';
 import { fromWei, toWei } from '../wei';
 
-import { ApprovalEntry } from './ApprovalList';
-
-interface EditableApprovalEntry {
-  amount: string;
-  spenderAddress: string;
-  tokenAddress: string;
-  originalAmount: string;
-}
-
 type ApprovalDialogProps = {
-  approvals: ApprovalEntry[];
   onCancel: () => void;
 };
 
@@ -36,22 +27,13 @@ const FlexRowWrapper = styled.div`
   gap: 4px;
 `;
 
-export const ApprovalDialog = (props: ApprovalDialogProps) => {
-  const { tokenInfoMap } = useContext(StoreContext).tokenStore;
-  const { approvals } = props;
+export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
+  const { tokenStore, uiStore } = useContext(StoreContext);
+  const tokenInfoMap = tokenStore.tokenInfoMap;
+
+  const approvals = uiStore.selectedApprovals;
 
   const [success, setSuccess] = useState(false);
-
-  const [approvalEntries, setApprovalEntries] = useState<EditableApprovalEntry[]>(
-    approvals
-      .sort((a, b) => a.listPosition - b.listPosition)
-      .map((approval) => ({
-        amount: approval.amount.toFixed(),
-        originalAmount: approval.amount.toFixed(),
-        spenderAddress: approval.spender,
-        tokenAddress: approval.tokenAddress,
-      })),
-  );
 
   const { sdk } = useSafeAppsSDK();
 
@@ -59,14 +41,14 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
 
   const submitDialog = useCallback(async () => {
     const txs = createApprovals(
-      approvalEntries.map((entry) => {
+      approvals.map((entry) => {
         const tokenInfo = tokenInfoMap?.get(entry.tokenAddress);
         if (!tokenInfo) {
           throw new Error(`No TokenInfo found for token with address: ${entry.tokenAddress}`);
         } else {
           return {
-            newValue: new BigNumber(entry.amount),
-            spenderAddress: entry.spenderAddress,
+            newValue: new BigNumber(entry.editedAmount),
+            spenderAddress: entry.spender,
             tokenInfo: tokenInfo,
           };
         }
@@ -76,7 +58,7 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
     if (response?.safeTxHash) {
       setSuccess(true);
     }
-  }, [approvalEntries, sdk.txs, tokenInfoMap]);
+  }, [approvals, sdk.txs, tokenInfoMap]);
 
   return (
     <GenericModal
@@ -86,9 +68,9 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
         <div>
           {!success ? (
             <div>
-              {approvalEntries.map((approval) => {
+              {approvals.map((approval) => {
                 const decimals = tokenInfoMap?.get(approval.tokenAddress)?.decimals ?? 18;
-                const amountInDecimals = new BigNumber(approval.amount);
+                const amountInDecimals = new BigNumber(approval.editedAmount);
                 return (
                   <ColumnGrid>
                     <FlexRowWrapper>
@@ -101,27 +83,21 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
                       <EthHashInfo hash={approval.tokenAddress} shortenHash={4} showCopyBtn />
                     </FlexRowWrapper>
                     <FlexRowWrapper>
-                      <EthHashInfo hash={approval.spenderAddress} shortenHash={4} showCopyBtn />
+                      <EthHashInfo hash={approval.spender} shortenHash={4} showCopyBtn />
                     </FlexRowWrapper>
                     <FlexRowWrapper>
                       <Checkbox
-                        checked={UNLIMITED_ALLOWANCE.isEqualTo(toWei(approval.amount, decimals))}
+                        checked={UNLIMITED_ALLOWANCE.isEqualTo(toWei(approval.editedAmount, decimals))}
                         label="No Limit"
                         name="unlimited"
                         onChange={(event, checked) => {
                           const newAmount = checked
-                            ? fromWei(UNLIMITED_ALLOWANCE, decimals).toFixed()
-                            : UNLIMITED_ALLOWANCE.isEqualTo(toWei(approval.originalAmount, decimals))
-                            ? '0'
-                            : approval.originalAmount;
-                          setApprovalEntries(
-                            approvalEntries.map((approvalEntry) =>
-                              approvalEntry.tokenAddress === approval.tokenAddress &&
-                              approvalEntry.spenderAddress === approval.spenderAddress
-                                ? { ...approvalEntry, amount: newAmount }
-                                : approvalEntry,
-                            ),
-                          );
+                            ? fromWei(UNLIMITED_ALLOWANCE, decimals)
+                            : UNLIMITED_ALLOWANCE.isEqualTo(toWei(approval.currentAmount, decimals))
+                            ? new BigNumber('0')
+                            : approval.currentAmount;
+
+                          approval.setEditedAmount(newAmount);
                         }}
                       />
                       <TextFieldInput
@@ -130,18 +106,11 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
                         placeholder="Amount"
                         label="Approval Amount"
                         variant="standard"
-                        value={approval.amount}
+                        value={approval.editedAmount}
                         error={amountInDecimals.isNaN() ? 'The value must be a number!' : undefined}
                         onChange={(event) => {
                           const newValue = event.target.value;
-                          setApprovalEntries(
-                            approvalEntries.map((approvalEntry) =>
-                              approvalEntry.tokenAddress === approval.tokenAddress &&
-                              approvalEntry.spenderAddress === approval.spenderAddress
-                                ? { ...approvalEntry, amount: newValue }
-                                : approvalEntry,
-                            ),
-                          );
+                          approval.setEditedAmount(new BigNumber(newValue));
                         }}
                       ></TextFieldInput>
                     </FlexRowWrapper>
@@ -160,4 +129,4 @@ export const ApprovalDialog = (props: ApprovalDialogProps) => {
       {...props}
     ></GenericModal>
   );
-};
+});

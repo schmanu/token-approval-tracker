@@ -1,13 +1,6 @@
 import { networkInfo } from '../../networks';
 
-export interface TokenInfo {
-  type: string;
-  address: string;
-  name: string;
-  symbol: string;
-  decimals: number;
-  logoUri: string;
-}
+import { TokenInfo } from './TokenStore';
 
 export const fetchTokenInfo = async (tokenAddress: string, network: number) => {
   const baseAPIURL = networkInfo.get(network)?.baseAPI;

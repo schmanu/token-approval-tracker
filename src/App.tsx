@@ -40,7 +40,7 @@ const SafeApp = (): React.ReactElement => {
       <HeaderWrapper>
         <Row>
           <img src="/logo.svg" width={64} height={64} alt="Logo"></img>
-          <Title size="xl">Token Approval Tracker</Title>
+          <Title size="xl">Token Approval Manager</Title>
         </Row>
         <Text size="xl">✅ Keep track of all your token approvals.</Text>
         <Text size="xl">✍️ Edit / Revoke multiple approvals in a single transaction.</Text>

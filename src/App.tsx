@@ -1,4 +1,4 @@
-import { Title, Text } from '@gnosis.pm/safe-react-components';
+import { Title, Text, Card } from '@gnosis.pm/safe-react-components';
 import React from 'react';
 import styled from 'styled-components';
 
@@ -11,10 +11,21 @@ import { UIStore } from './stores/ui/UIStore';
 
 const Container = styled.div`
   padding: 1rem;
-  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+`;
+
+const HeaderWrapper = styled.div`
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
 
 const tokenStore = new TokenStore();
@@ -25,15 +36,21 @@ const uiStore = new UIStore();
 
 const SafeApp = (): React.ReactElement => {
   return (
-    <StoreContextProvider stores={{ tokenStore, transactionStore, uiStore }} loading={<ApprovalLoader />}>
-      <Container>
-        <Title size="xl">Token Approval Tracker</Title>
+    <Container>
+      <HeaderWrapper>
+        <Row>
+          <img src="/logo.svg" width={64} height={64} alt="Logo"></img>
+          <Title size="xl">Token Approval Tracker</Title>
+        </Row>
         <Text size="xl">✅ Keep track of all your token approvals.</Text>
-        <Text size="xl">✍️ Edit / Revoke multiple approvals in one transaction.</Text>
-        <Text size="xl">🔔 Get notified about approvals for malicious contracts.</Text>
-        <ApprovalList />
-      </Container>
-    </StoreContextProvider>
+        <Text size="xl">✍️ Edit / Revoke multiple approvals in a single transaction.</Text>
+      </HeaderWrapper>
+      <Card>
+        <StoreContextProvider stores={{ tokenStore, transactionStore, uiStore }} loading={<ApprovalLoader />}>
+          <ApprovalList />
+        </StoreContextProvider>
+      </Card>
+    </Container>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Button, Card } from '@gnosis.pm/safe-react-components';
+import { Button } from '@gnosis.pm/safe-react-components';
 import { observer } from 'mobx-react';
 import { useContext, useState } from 'react';
 
@@ -14,7 +14,7 @@ export const ApprovalList = observer(() => {
 
   const approvals = uiStore.approvals;
   return (
-    <Card>
+    <>
       <ApprovalHeader />
       {approvals?.map((approval) => (
         <ApprovalEntry approval={approval} />
@@ -33,6 +33,6 @@ export const ApprovalList = observer(() => {
           <ApprovalDialog onCancel={() => setApprovalDialogOpen(false)} />
         </div>
       )}
-    </Card>
+    </>
   );
 });

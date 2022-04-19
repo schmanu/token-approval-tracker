@@ -23,6 +23,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "lint": "eslint --max-warnings 0 .",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate-types": "typechain --target=ethers-v5 --out-dir src/contracts './node_modules/@openzeppelin/contracts/build/contracts/ERC20.json'",

@@ -98,7 +98,7 @@ export const fetchApprovalTransactions = async (
         const result: AccumulatedApproval[] = [];
         for (const tokenEntry of approvalMap.entries()) {
           const transactionsBySpender = reduceToMap(tokenEntry[1], (tx) => {
-            const spender = tx.dataDecoded?.parameters?.find((param) => param.name === 'spender')?.value as string;
+            const spender = tx.dataDecoded?.parameters?.find((param) => param.type === 'address')?.value as string;
             if (!spender) {
               throw Error('Approvals without spender');
             }
@@ -115,7 +115,7 @@ export const fetchApprovalTransactions = async (
                 transactions: spenderEntry[1].map((tx) => ({
                   executionDate: tx.executionDate,
                   txHash: tx.transactionHash,
-                  value: tx.dataDecoded?.parameters?.find((param) => param.name === 'value')?.value as string,
+                  value: tx.dataDecoded?.parameters?.find((param) => param.type === 'uint256')?.value as string,
                 })),
               });
             }

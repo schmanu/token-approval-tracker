@@ -110,7 +110,7 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                   </ColumnGrid>
                 );
               })}
-              <Button size="md" onClick={submitDialog}>
+              <Button size="lg" onClick={submitDialog}>
                 Submit
               </Button>
             </div>

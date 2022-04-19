@@ -68,7 +68,6 @@ const unpackApprovalTransactions = (tx: TransactionDetails) => {
 };
 
 const fetchTransactionDetails = async (tx: TransactionListItem, chainID: string) => {
-  console.log(`Fetching details for: ${JSON.stringify(tx)}`);
   if (tx.type === 'TRANSACTION') {
     return await getTransactionDetails(baseAPI, chainID, tx.transaction.id).catch(() => undefined);
   }

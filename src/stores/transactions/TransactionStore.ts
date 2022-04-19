@@ -35,7 +35,6 @@ export class TransactionStore {
   };
 
   setApprovalTransactions = (approvals: AccumulatedApproval[]) => {
-    console.log(`Setting Transactions to ${approvals.length} `);
     this.approvalTransactions = approvals;
     this.isTransactionDataLoading = false;
   };

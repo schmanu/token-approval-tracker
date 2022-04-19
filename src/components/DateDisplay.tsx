@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 interface DateDisplayProps {
-  isoDate: string;
+  value: string | number;
 }
 
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -23,8 +23,8 @@ const MonthField = styled.p``;
 const YearField = styled.p``;
 
 export const DateDisplay = (props: DateDisplayProps) => {
-  const { isoDate } = props;
-  const date = new Date(isoDate);
+  const { value } = props;
+  const date = new Date(value);
 
   return (
     <Wrapper>

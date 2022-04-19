@@ -6,13 +6,14 @@ import { useContext } from 'react';
 
 import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { StoreContext } from '../../stores/StoreContextProvider';
+import { Transaction } from '../../stores/transactions/TransactionStore';
 import { fromWei } from '../../wei';
 import { DateDisplay } from '../DateDisplay';
 
 import { AccordionDetailsContainer, ColumnGrid, FlexRowWrapper } from './Container';
 
 interface ApprovalTransactionHistoryProps {
-  transactions: { executionDate: string; value?: string; txHash: string }[];
+  transactions: Transaction[];
   tokenAddress: string;
 }
 
@@ -33,13 +34,13 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
                 <Text size="lg" strong>
                   TX hash:
                 </Text>
-                <EthHashInfo hash={tx.txHash} shortenHash={4} showCopyBtn />
+                {tx.txHash && <EthHashInfo hash={tx.txHash} shortenHash={4} showCopyBtn />}
               </FlexRowWrapper>
               <FlexRowWrapper>
                 <Text size="lg" strong>
                   Date:
                 </Text>
-                <DateDisplay isoDate={tx.executionDate} />
+                {tx.executionDate && <DateDisplay value={tx.executionDate} />}
               </FlexRowWrapper>
               <FlexRowWrapper>
                 <Text size="lg" strong>

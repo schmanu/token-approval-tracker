@@ -3,7 +3,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 
 import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { fromWei, toWei } from '../../wei';
-import { AccumulatedApproval } from '../transactions/TransactionStore';
+import { AccumulatedApproval, Transaction } from '../transactions/TransactionStore';
 
 export class UIApprovalEntry {
   tokenAddress: string;
@@ -15,7 +15,7 @@ export class UIApprovalEntry {
   inputMode: 'custom' | 'unlimited' | 'revoke';
   selected: boolean;
   decimals: number;
-  transactions: { executionDate: string; value?: string; txHash: string }[];
+  transactions: Transaction[];
 
   constructor(approval: AccumulatedApproval, decimals: number) {
     this.tokenAddress = approval.tokenAddress;

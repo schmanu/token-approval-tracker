@@ -68,6 +68,7 @@ const unpackApprovalTransactions = (tx: TransactionDetails) => {
 };
 
 const fetchTransactionDetails = async (tx: TransactionListItem, chainID: string) => {
+  console.log(`Fetching details for: ${JSON.stringify(tx)}`);
   if (tx.type === 'TRANSACTION') {
     return await getTransactionDetails(baseAPI, chainID, tx.transaction.id).catch(() => undefined);
   }
@@ -78,7 +79,6 @@ export const fetchApprovalTransactions = async (
   safeAddress: string,
   network: number,
   safeAppProvider: SafeAppProvider,
-  offset: number = 0,
 ) => {
   const baseAPIURL = networkInfo.get(network)?.baseAPI;
 
@@ -127,6 +127,12 @@ export const fetchApprovalTransactions = async (
   }
 };
 
+/**
+ * Creates Map from an array and a key function.
+ * @param list array that should be reduced
+ * @param keyFunc computes to which key the list entry will be added
+ * @returns a map which maps from keys to all list entries, which computed that key for their value
+ */
 function reduceToMap<T, K extends string | number>(list: Array<T>, keyFunc: (value: T) => K) {
   return list.reduce((prev, curr) => {
     const key = keyFunc(curr);

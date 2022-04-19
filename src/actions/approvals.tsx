@@ -3,7 +3,9 @@ import { BaseTransaction } from '@gnosis.pm/safe-apps-sdk';
 import { ERC20__factory } from '../contracts';
 import { UIApprovalEntry } from '../stores/ui/UIStore';
 
-export const createApprovals = (approvals: UIApprovalEntry[]): BaseTransaction[] => {
+type ApprovalChange = Pick<UIApprovalEntry, 'tokenAddress' | 'spender' | 'editedAmountInWEI'>;
+
+export const createApprovals = (approvals: ApprovalChange[]): BaseTransaction[] => {
   const erc20Interface = ERC20__factory.createInterface();
   const txList = approvals.map((approval) => ({
     to: approval.tokenAddress,

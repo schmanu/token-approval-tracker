@@ -1,4 +1,4 @@
-import { Title, Text, Icon, Divider, Card } from '@gnosis.pm/safe-react-components';
+import { Title, Text, Card } from '@gnosis.pm/safe-react-components';
 import React from 'react';
 import styled from 'styled-components';
 

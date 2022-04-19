@@ -1,4 +1,4 @@
-import { Button, Card } from '@gnosis.pm/safe-react-components';
+import { Button } from '@gnosis.pm/safe-react-components';
 import { observer } from 'mobx-react';
 import { useContext, useState } from 'react';
 

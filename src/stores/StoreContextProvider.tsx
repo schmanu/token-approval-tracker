@@ -48,29 +48,34 @@ export const StoreContextProvider = (props: {
     fetchApprovals(safe.safeAddress, safe.chainId, new SafeAppProvider(safe, sdk));
   }, [fetchApprovals, safe, sdk]);
 
-  reaction(
-    () => transactionStore.approvalTransactions,
-    (approvals) => {
-      tokenStore.loadTokenInfo(approvals, safe.chainId);
-    },
-  );
+  useEffect(() => {
+    reaction(
+      () => transactionStore.approvalTransactions,
+      (approvals) => {
+        tokenStore.loadTokenInfo(approvals, safe.chainId);
+      },
+    );
 
-  reaction(
-    () => ({ tokenInfoMap: tokenStore.tokenInfoMap, approvalTransactions: transactionStore.approvalTransactions }),
-    (data) => {
-      const { tokenInfoMap, approvalTransactions } = data;
-      const uiApprovals = approvalTransactions
-        .map((approval) => {
-          const decimals = tokenInfoMap.get(approval.tokenAddress)?.decimals;
-          if (typeof decimals !== 'undefined') {
-            return new UIApprovalEntry(approval, decimals);
-          }
-          return undefined;
-        })
-        .filter((value) => typeof value !== 'undefined') as UIApprovalEntry[];
-      uiStore.setApprovals(uiApprovals);
-    },
-  );
+    reaction(
+      () => ({ tokenInfoMap: tokenStore.tokenInfoMap, approvalTransactions: transactionStore.approvalTransactions }),
+      (data) => {
+        const { tokenInfoMap, approvalTransactions } = data;
+        const uiApprovals = approvalTransactions
+          .map((approval) => {
+            const decimals = tokenInfoMap.get(approval.tokenAddress)?.decimals;
+            if (typeof decimals !== 'undefined') {
+              return new UIApprovalEntry(approval, decimals);
+            }
+            return undefined;
+          })
+          .filter((value) => typeof value !== 'undefined') as UIApprovalEntry[];
+        uiStore.setApprovals(uiApprovals);
+      },
+    );
+    // reaction is a reactive function from mobx and will rerender on changes to the stores.
+    // calling it twice using useEffect will cause too many reactions.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safe.chainId]);
 
   return (
     <StoreContext.Provider value={{ transactionStore, tokenStore, uiStore }}>

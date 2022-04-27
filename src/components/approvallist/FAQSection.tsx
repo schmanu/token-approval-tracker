@@ -64,7 +64,7 @@ export const FAQSection: () => ReactElement = () => {
           <StyledDetails>
             <Text size="xl">
               ERC20 Approvals are widely used in all kinds of dapps which interact with ERC20 tokens (i.e. DEXes like
-              Cowswap or 1Inch). While the concept is very convenient it comes with certain risks and problems
+              Cowswap or 1Inch). While the concept is very convenient it comes with certain risks and problems:
               <ol>
                 <li>
                   It gets really hard for users to keep track of how many approvals have been given to which dapps /
@@ -75,11 +75,11 @@ export const FAQSection: () => ReactElement = () => {
                 </li>
                 <li>
                   Non malicious smart contracts can have vulnerabilities enabling malicious users to potential drain
-                  ERC20 tokens of others if allowances still exist
+                  ERC20 tokens of others if allowances still exist.
                 </li>
                 <li>
-                  Malicious contracts exists with the goal to bait people into giving ERC20 approvals for this contracts
-                  to transfer all assets as soon as enough approvals are accumulated.
+                  Malicious contracts exist which intentionally bait people into giving ERC20 approvals to drain their
+                  funds.
                 </li>
               </ol>
             </Text>

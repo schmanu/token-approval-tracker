@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { ApprovalLoader } from './components/ApprovalLoader';
 import { ApprovalList } from './components/approvallist/ApprovalList';
+import { FAQSection } from './components/approvallist/FAQSection';
 import { StoreContextProvider } from './stores/StoreContextProvider';
 import { TokenStore } from './stores/tokens/TokenStore';
 import { TransactionStore } from './stores/transactions/TransactionStore';
@@ -50,6 +51,7 @@ const SafeApp = (): React.ReactElement => {
           <ApprovalList />
         </StoreContextProvider>
       </Card>
+      <FAQSection />
     </Container>
   );
 };

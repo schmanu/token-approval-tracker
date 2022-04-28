@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { ApprovalLoader } from './components/ApprovalLoader';
+import { Footer } from './components/Footer';
 import { ApprovalList } from './components/approvallist/ApprovalList';
 import { FAQSection } from './components/approvallist/FAQSection';
 import { StoreContextProvider } from './stores/StoreContextProvider';
@@ -12,6 +13,7 @@ import { UIStore } from './stores/ui/UIStore';
 
 const Container = styled.div`
   padding: 1rem;
+  padding-top: 0rem;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -19,6 +21,7 @@ const Container = styled.div`
 
 const HeaderWrapper = styled.div`
   padding: 1rem;
+  padding-top: 0rem;
   display: flex;
   flex-direction: column;
 `;
@@ -52,6 +55,7 @@ const SafeApp = (): React.ReactElement => {
         </StoreContextProvider>
       </Card>
       <FAQSection />
+      <Footer />
     </Container>
   );
 };

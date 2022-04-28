@@ -1,17 +1,29 @@
 import { Title, Checkbox, Text } from '@gnosis.pm/safe-react-components';
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
+import styled from 'styled-components';
 
 import { StoreContext } from '../../stores/StoreContextProvider';
+import { Settings } from '../header/Settings';
 
 import { ColumnGrid, FlexRowWrapper } from './Container';
+
+const StyledFirstRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
 
 export const ApprovalHeader = observer(() => {
   const { uiStore } = useContext(StoreContext);
 
   return (
     <>
-      <Title size="md">Approvals</Title>
+      <StyledFirstRow>
+        <Title size="md">Approvals</Title>
+        <Settings />
+      </StyledFirstRow>
       <ColumnGrid
         style={{
           paddingLeft: 22,

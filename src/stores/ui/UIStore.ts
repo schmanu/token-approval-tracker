@@ -85,13 +85,18 @@ export class UIApprovalEntry {
 
 export class UIStore {
   readonly approvals = observable<UIApprovalEntry>([]);
+  hideRevokedApprovals: boolean;
 
   constructor() {
+    this.hideRevokedApprovals = false;
     makeObservable(this, {
       approvals: observable,
+      hideRevokedApprovals: observable,
       setApprovals: action,
+      toggleHideRevokedApprovals: action,
       allSelected: computed,
       selectedApprovals: computed,
+      filteredApprovals: computed,
     });
   }
 
@@ -99,8 +104,20 @@ export class UIStore {
     this.approvals.replace(newApprovals);
   };
 
+  toggleHideRevokedApprovals = () => {
+    this.hideRevokedApprovals = !this.hideRevokedApprovals;
+  };
+
   get allSelected() {
     return !this.approvals.some((value) => !value.selected);
+  }
+
+  get filteredApprovals() {
+    if (this.hideRevokedApprovals) {
+      return this.approvals.filter((approval) => !approval.currentAmount.isZero());
+    } else {
+      return this.approvals;
+    }
   }
 
   get selectedApprovals() {

@@ -1,5 +1,6 @@
 import { action, makeObservable, observable } from 'mobx';
 
+import { reduceToSet } from '../../utils/arrayReducers';
 import { AccumulatedApproval } from '../transactions/TransactionStore';
 
 import { fetchTokenInfo } from './TokenService';
@@ -26,7 +27,10 @@ export class TokenStore {
   }
 
   loadTokenInfo = (approvalTransactions: AccumulatedApproval[], network: number) => {
-    const promisedTokens = approvalTransactions.map((approval) => fetchTokenInfo(approval.tokenAddress, network));
+    const uniqueTokenAddresses = reduceToSet(approvalTransactions, (value) => value.tokenAddress);
+    const promisedTokens = Array.from(uniqueTokenAddresses.values()).map((tokenAddress) =>
+      fetchTokenInfo(tokenAddress, network),
+    );
     Promise.all(promisedTokens)
       .then((tokenResults) => {
         const entries: [string, TokenInfo][] = (

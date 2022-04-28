@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import { ApprovalLoader } from './components/ApprovalLoader';
 import { ApprovalList } from './components/approvallist/ApprovalList';
+import { Settings } from './components/header/Settings';
 import { StoreContextProvider } from './stores/StoreContextProvider';
 import { TokenStore } from './stores/tokens/TokenStore';
 import { TransactionStore } from './stores/transactions/TransactionStore';

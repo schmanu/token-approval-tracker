@@ -32,6 +32,9 @@ export const StoreContext = createContext<{
     allSelected: false,
     selectAll: () => {},
     selectedApprovals: [],
+    hideRevokedApprovals: false,
+    toggleHideRevokedApprovals: () => {},
+    filteredApprovals: [],
   },
 });
 

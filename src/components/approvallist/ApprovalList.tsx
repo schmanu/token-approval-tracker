@@ -12,7 +12,7 @@ export const ApprovalList = observer(() => {
   const { uiStore } = useContext(StoreContext);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
 
-  const approvals = uiStore.approvals;
+  const approvals = uiStore.filteredApprovals;
   return (
     <>
       <ApprovalHeader />

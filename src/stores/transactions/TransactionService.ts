@@ -9,6 +9,7 @@ import {
 
 import { getAllowance } from '../../actions/allowance';
 import { networkInfo } from '../../networks';
+import { reduceToMap } from '../../utils/arrayReducers';
 import { TokenInfo } from '../tokens/TokenStore';
 
 import { AccumulatedApproval } from './TransactionStore';
@@ -137,20 +138,6 @@ export const fetchApprovalTransactions = async (
     })
     .catch(() => [] as AccumulatedApproval[]);
 };
-
-/**
- * Creates Map from an array and a key function.
- * @param list array that should be reduced
- * @param keyFunc computes to which key the list entry will be added
- * @returns a map which maps from keys to all list entries, which computed that key for their value
- */
-function reduceToMap<T, K extends string | number>(list: Array<T>, keyFunc: (value: T) => K) {
-  return list.reduce((prev, curr) => {
-    const key = keyFunc(curr);
-    prev.has(key) ? prev.get(key)?.push(curr) : prev.set(key, [curr]);
-    return prev;
-  }, new Map<K, T[]>());
-}
 
 export const fetchTokenInfo = async (tokenAddress: string, network: number) => {
   const baseAPIURL = networkInfo.get(network)?.baseAPI;

@@ -12,21 +12,12 @@ export const getAllowance = async (
 ): Promise<BigNumber | undefined> => {
   const web3 = new ethers.providers.Web3Provider(provider);
   const contract = ERC20__factory.connect(tokenAddress, web3);
-  const decimals = await contract.decimals().catch((error) => {
-    console.log(`Error while fetching decimals: ${error}`);
-    return undefined;
-  });
-  if (typeof decimals !== 'undefined') {
-    return await contract
-      .allowance(ownerAddress, spenderAddress)
-      .then((allowance) => allowance.toString())
-      .then((allowance) => new BigNumber(allowance))
-      .catch((error) => {
-        console.log(`Error while fetching approval: ${error}`);
-        return undefined;
-      });
-  } else {
-    console.log(`No decimals found for contract at ${tokenAddress}. Skipping allowance fetching.`);
-    return undefined;
-  }
+  return await contract
+    .allowance(ownerAddress, spenderAddress)
+    .then((allowance) => allowance.toString())
+    .then((allowance) => new BigNumber(allowance))
+    .catch((error) => {
+      console.log(`Error while fetching approval: ${error}`);
+      return undefined;
+    });
 };

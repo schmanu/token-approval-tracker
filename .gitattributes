@@ -1,9 +1,9 @@
-*       text=auto
-*.ts    text
-*.tsx   text
-*.json  text
-*.js    text
-*.svg   text
-*.md    text
-*.html  text
-*.text  text
+*       text=auto eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.json  text eol=lf
+*.js    text eol=lf
+*.svg   text eol=lf
+*.md    text eol=lf
+*.html  text eol=lf
+*.text  text eol=lf

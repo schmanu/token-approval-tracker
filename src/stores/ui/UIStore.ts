@@ -109,7 +109,7 @@ export class UIStore {
   };
 
   get allSelected() {
-    return !this.approvals.some((value) => !value.selected);
+    return !this.filteredApprovals.some((value) => !value.selected);
   }
 
   get filteredApprovals() {
@@ -125,7 +125,7 @@ export class UIStore {
   }
 
   selectAll = (selected: boolean) => {
-    this.approvals.forEach((approval) => {
+    this.filteredApprovals.forEach((approval) => {
       approval.setSelected(selected);
     });
   };

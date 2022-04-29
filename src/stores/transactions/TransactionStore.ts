@@ -29,7 +29,7 @@ export class TransactionStore {
   }
 
   fetchApprovals = (safeAddress: string, chainId: number, web3Provider: SafeAppProvider) => {
-    fetchApprovalTransactions(safeAddress, chainId, web3Provider)
+    fetchApprovalTransactions(safeAddress, web3Provider)
       .then((approvals) => this.setApprovalTransactions(approvals))
       .catch(() => this.setApprovalTransactions([]));
   };

@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { UNLIMITED_ALLOWANCE } from '../constants';
 import { ERC20__factory } from '../contracts';
-import { toWei } from '../wei';
+import { toWei } from '../utils/wei';
 
 import { createApprovals } from './approvals';
 

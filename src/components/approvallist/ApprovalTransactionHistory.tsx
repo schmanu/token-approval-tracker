@@ -7,7 +7,7 @@ import { useContext } from 'react';
 import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { StoreContext } from '../../stores/StoreContextProvider';
 import { Transaction } from '../../stores/transactions/TransactionStore';
-import { fromWei } from '../../wei';
+import { fromWei } from '../../utils/wei';
 import { DateDisplay } from '../DateDisplay';
 
 import { AccordionDetailsContainer, ColumnGrid, FlexRowWrapper } from './Container';

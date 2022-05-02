@@ -1,6 +1,6 @@
 {
   "name": "token-approval-manager",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "dependencies": {
     "@gnosis.pm/safe-apps-provider": "0.10.1",

@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { UNLIMITED_ALLOWANCE } from '../../constants';
-import { fromWei, toWei } from '../../wei';
+import { fromWei, toWei } from '../../utils/wei';
 import { AccumulatedApproval, Transaction } from '../transactions/TransactionStore';
 
 export class UIApprovalEntry {

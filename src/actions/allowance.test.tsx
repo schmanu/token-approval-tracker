@@ -2,7 +2,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { UNLIMITED_ALLOWANCE } from '../constants';
 import { createMockSafeAppProvider } from '../testutils/utils';
-import { fromWei } from '../wei';
+import { fromWei } from '../utils/wei';
 
 import { getAllowance } from './allowance';
 

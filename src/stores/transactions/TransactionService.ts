@@ -1,6 +1,6 @@
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
 import { ethers } from 'ethers';
-import { hexZeroPad } from 'ethers/lib/utils';
+import { hexZeroPad, LogDescription } from 'ethers/lib/utils';
 
 import { getAllowance } from '../../actions/allowance';
 import { ERC20__factory } from '../../contracts';
@@ -10,7 +10,18 @@ import { TokenInfo } from '../tokens/TokenStore';
 
 import { AccumulatedApproval } from './TransactionStore';
 
-export const fetchApprovalsOnChain = async (safeAddress: string, safeAppProvider: SafeAppProvider) => {
+interface TransactionLog {
+  tokenAddress: string;
+  txHash: string;
+  blockHash: string;
+  timestamp: number;
+  parsedLog: LogDescription;
+}
+
+export const fetchApprovalsOnChain: (
+  safeAddress: string,
+  safeAppProvider: SafeAppProvider,
+) => Promise<TransactionLog[]> = async (safeAddress, safeAppProvider) => {
   const web3Provider = new ethers.providers.Web3Provider(safeAppProvider);
   const contractInterface = new ethers.utils.Interface(ERC20__factory.abi);
   const approvalLogs = await web3Provider
@@ -46,17 +57,17 @@ export const fetchApprovalsOnChain = async (safeAddress: string, safeAppProvider
 export const fetchApprovalTransactions = async (safeAddress: string, safeAppProvider: SafeAppProvider) => {
   const transactionsByToken = await fetchApprovalsOnChain(safeAddress, safeAppProvider)
     .then((transactions) => transactions.sort((a, b) => b.timestamp - a.timestamp))
-    .then((transactions) => reduceToMap(transactions, (obj) => obj.tokenAddress));
+    .then((transactions) => reduceToMap(transactions, (obj) => obj.tokenAddress))
+    .catch((reason) => {
+      console.error(`Error while fetching approval transactions: ${reason}`);
+      return new Map<string, TransactionLog[]>();
+    });
 
   const result: AccumulatedApproval[] = [];
   for (const tokenEntry of transactionsByToken.entries()) {
     const transactions = tokenEntry[1];
     const transactionsBySpender = reduceToMap(transactions, (tx) => {
-      const spender = tx.parsedLog.args[1] as string;
-      if (!spender) {
-        throw Error('Approvals without spender');
-      }
-      return spender;
+      return tx.parsedLog.args[1] as string;
     });
 
     for (const spenderEntry of transactionsBySpender.entries()) {
@@ -92,6 +103,8 @@ export const fetchTokenInfo = async (tokenAddress: string, network: number) => {
           throw Error(response.statusText);
         }
       })
-      .catch(() => undefined);
+      .catch((reason) => {
+        console.error(`Error while loading token info for address ${tokenAddress}: ${reason}`);
+      });
   }
 };

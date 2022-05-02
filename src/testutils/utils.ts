@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 
 import { ERC20__factory } from '../contracts';
-import { toWei } from '../wei';
+import { toWei } from '../utils/wei';
 
 const erc20Interface = ERC20__factory.createInterface();
 

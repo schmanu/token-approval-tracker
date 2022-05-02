@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 
 import { createMockSafeAppProvider } from '../../testutils/utils';
-import { toWei } from '../../wei';
+import { toWei } from '../../utils/wei';
 
 import { fetchApprovalTransactions } from './TransactionService';
 

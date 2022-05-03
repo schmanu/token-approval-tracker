@@ -6,6 +6,7 @@ export const ColumnGrid = styled.div`
   width: 100%;
 `;
 
+// This is only used in one component. I'd keep it there.
 export const AccordionDetailsContainer = styled.div`
   width: 100%;
   display: flex;

@@ -29,6 +29,7 @@ export const ApprovalList = observer(() => {
         Edit Approvals
       </Button>
       {approvalDialogOpen && (
+        // Larger objects are better moved outside of components.
         <div style={{ position: 'absolute', top: '0px', height: '100%', width: '100%' }}>
           <ApprovalDialog onCancel={() => setApprovalDialogOpen(false)} />
         </div>

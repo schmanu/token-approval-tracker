@@ -1,3 +1,4 @@
+// You're not rendering any React in this test. It can be a `.ts` file.
 import { BigNumber } from 'bignumber.js';
 
 import { UNLIMITED_ALLOWANCE } from '../constants';
@@ -11,6 +12,8 @@ const spenderAddress = '0x2000000000000000000000000000000000000000';
 const tokenAddress = '0x1230000000000000000000000000000000000000';
 
 describe('getAllowance()', () => {
+  // It took me a while to understand what you were trying to test here.
+  // I would aim to be more descriptive with your tests, i.e. `it('should handle tokens with 18 decimals')`.
   test('Token with 18 decimals', async () => {
     const mockProvider = createMockSafeAppProvider({
       decimals: 18,

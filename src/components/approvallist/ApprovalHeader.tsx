@@ -34,16 +34,15 @@ export const ApprovalHeader = observer(() => {
         }}
       >
         <FlexRowWrapper>
-          <div onClick={(event) => event.stopPropagation()} style={{ width: 0 }}>
-            <Checkbox
-              checked={uiStore.allSelected}
-              label=""
-              name="checkAll"
-              onChange={(event, checked) => {
-                uiStore.selectAll(checked);
-              }}
-            />
-          </div>
+          <Checkbox
+            checked={uiStore.allSelected}
+            label=""
+            name="checkAll"
+            onChange={(event, checked) => {
+              event.stopPropagation();
+              uiStore.selectAll(checked);
+            }}
+          />
         </FlexRowWrapper>
         <FlexRowWrapper>
           <Text size="xl" strong>

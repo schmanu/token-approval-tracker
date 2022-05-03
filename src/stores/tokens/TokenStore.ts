@@ -33,7 +33,8 @@ export class TokenStore {
     );
     Promise.all(promisedTokens)
       .then((tokenResults) => {
-        const entries: [string, TokenInfo][] = (
+        // I think a hash map is cleaner here.
+        const entries: [string, TokenInfo][] = ( // Here you could use aforementioned type guard here instead of casting.
           tokenResults.filter((result) => typeof result !== 'undefined') as TokenInfo[]
         ).map((result) => [result.address, result]);
         this.setTokenInfo(new Map<string, TokenInfo>(entries));

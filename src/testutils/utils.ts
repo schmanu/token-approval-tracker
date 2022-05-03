@@ -79,6 +79,7 @@ const createMockApprovalLogEntries = (dataArray: MockApprovalData[] | undefined,
   return result;
 };
 
+// This is really cool!
 export const createMockSafeAppProvider: (returnData: {
   decimals?: number;
   allowance?: BigNumber;

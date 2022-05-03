@@ -8,6 +8,7 @@ import App from './App';
 import GlobalStyle from './GlobalStyle';
 
 ReactDOM.render(
+  // You may have been encountering too many re-renders by using StrictMode. It runs every effect twice.
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <GlobalStyle />

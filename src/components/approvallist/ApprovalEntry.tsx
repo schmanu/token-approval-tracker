@@ -13,7 +13,10 @@ interface ApprovalEntryProps {
   approval: UIApprovalEntry;
 }
 
+// Although in React 18 it is no longer the case, using `React.FC` is considered bad practice.
+// It automatically adds `children` typed as `ReactNode`. It's better to be stricter with your typing.
 export const ApprovalEntry: React.FC<ApprovalEntryProps> = observer((props) => {
+  // If you're not spreading the props, you can destructure it above.
   const { approval } = props;
 
   const { tokenStore } = useContext(StoreContext);
@@ -24,6 +27,7 @@ export const ApprovalEntry: React.FC<ApprovalEntryProps> = observer((props) => {
       <AccordionSummary>
         <ColumnGrid>
           <FlexRowWrapper>
+            {/* It's very picky, but I would stop the propagation where the event occurs: before calling `toggleSelected`. */}
             {/* small wrapper which stops the accordion from reacting to a checkbox click */}
             <div onClick={(event) => event.stopPropagation()} style={{ width: 0 }}>
               <Checkbox

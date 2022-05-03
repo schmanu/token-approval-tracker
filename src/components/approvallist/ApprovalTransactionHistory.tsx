@@ -34,6 +34,7 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
                 <Text size="lg" strong>
                   TX hash:
                 </Text>
+                {/* I would suggest adding a placeholder if there is no `txHash` or `executionDate`. */}
                 {tx.txHash && <EthHashInfo hash={tx.txHash} shortenHash={4} showCopyBtn />}
               </FlexRowWrapper>
               <FlexRowWrapper>
@@ -50,6 +51,7 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
                   <Text size="lg">Unlimited</Text>
                 ) : (
                   <Text size="lg">
+                    {/* I would extract 18 to a declarative CONSTANT. */}
                     {fromWei(new BigNumber(tx.value ?? 0), tokenMap?.get(tokenAddress)?.decimals ?? 18).toFixed()}
                   </Text>
                 )}

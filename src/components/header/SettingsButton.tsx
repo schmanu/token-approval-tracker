@@ -28,9 +28,8 @@ const StyledIcon = styled(Icon)`
 interface SettingsButtonProps {
   onClick: () => void;
 }
-
-export const SettingsButton: (props: SettingsButtonProps) => ReactElement = (props) => {
-  const { onClick } = props;
+// This caught me off guard on first sight. I would just type the return type instead of the whole function.
+export const SettingsButton = ({ onClick }: SettingsButtonProps): ReactElement => {
   return (
     <StyledButton onClick={onClick}>
       <Text size="lg" strong>

@@ -55,11 +55,13 @@ export const fetchApprovalsOnChain: (
  * @returns approve transactions grouped by token and spender address containing the remaining allowance
  */
 export const fetchApprovalTransactions = async (safeAddress: string, safeAppProvider: SafeAppProvider) => {
+  // It's definitely syntactic sugar, but I would say `try/catch` would be easier to follow here.
   const transactionsByToken = await fetchApprovalsOnChain(safeAddress, safeAppProvider)
     .then((transactions) => transactions.sort((a, b) => b.timestamp - a.timestamp))
     .then((transactions) => reduceToMap(transactions, (obj) => obj.tokenAddress))
     .catch((reason) => {
       console.error(`Error while fetching approval transactions: ${reason}`);
+      // I would suggest ahash map here as well.
       return new Map<string, TransactionLog[]>();
     });
 
@@ -67,10 +69,12 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
   for (const tokenEntry of transactionsByToken.entries()) {
     const transactions = tokenEntry[1];
     const transactionsBySpender = reduceToMap(transactions, (tx) => {
-      return tx.parsedLog.args[1] as string;
+      return tx.parsedLog.args[1];
     });
 
     for (const spenderEntry of transactionsBySpender.entries()) {
+      // If hashmaps were used, this would be a bit easier to follow.
+      // In it's current form, I would assign `tokenEntry[0]` and `spenderEntry[0]` to declarative variables.
       const allowance = await getAllowance(safeAddress, tokenEntry[0], spenderEntry[0], safeAppProvider);
       if (typeof allowance !== 'undefined') {
         result.push({
@@ -78,7 +82,7 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
           tokenAddress: tokenEntry[0],
           allowance: allowance.toFixed(),
           transactions: spenderEntry[1].map((tx) => ({
-            executionDate: tx.timestamp * 1000, // millis
+            executionDate: tx.timestamp * 1_000, // millis
             txHash: tx.txHash,
             value: (tx.parsedLog.args[2] as ethers.BigNumber).toHexString(),
           })),
@@ -94,17 +98,16 @@ export const fetchTokenInfo = async (tokenAddress: string, network: number) => {
 
   if (!baseAPIURL) {
     return undefined;
-  } else {
-    return await fetch(`${baseAPIURL}/tokens/${tokenAddress}/`)
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json() as Promise<TokenInfo>;
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .catch((reason) => {
-        console.error(`Error while loading token info for address ${tokenAddress}: ${reason}`);
-      });
   }
+
+  return await fetch(`${baseAPIURL}/tokens/${tokenAddress}/`)
+    .then((response: Response) => {
+      if (response.ok) {
+        return response.json() as Promise<TokenInfo>;
+      }
+      throw Error(response.statusText);
+    })
+    .catch((reason) => {
+      console.error(`Error while loading token info for address ${tokenAddress}: ${reason}`);
+    });
 };

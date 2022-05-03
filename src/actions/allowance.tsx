@@ -4,6 +4,8 @@ import { ethers } from 'ethers';
 
 import { ERC20__factory } from '../contracts';
 
+// I would type this as returning `void` instead of `undefined`
+// and you wouldn't need to return anything in the catch block.
 export const getAllowance = async (
   ownerAddress: string,
   tokenAddress: string,

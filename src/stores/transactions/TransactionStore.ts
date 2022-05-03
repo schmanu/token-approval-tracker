@@ -17,7 +17,7 @@ export interface AccumulatedApproval {
 
 export class TransactionStore {
   isTransactionDataLoading = true;
-  approvalTransactions = [] as AccumulatedApproval[];
+  approvalTransactions: AccumulatedApproval[] = [];
 
   constructor() {
     makeObservable(this, {

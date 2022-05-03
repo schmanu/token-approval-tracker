@@ -6,6 +6,10 @@ type NetworkInfo = {
   baseAPI?: string;
 };
 
+// I'm not entirely show how we approach Safe Apps usage of the gateway, but we
+// are trying to not use the transaction service anymore.
+// There is also the possibility of retrieving the current transaction service
+// URL via the Safe Apps SDK as far as I know. I am not 100% certain though.
 export const networkInfo = new Map<number, NetworkInfo>([
   [
     1,

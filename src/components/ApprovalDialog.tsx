@@ -29,6 +29,7 @@ const FlexRowWrapper = styled.div`
 `;
 
 export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
+  // It's a small thing, but I would recommend creating `useStore` hook that returns this context.
   const { tokenStore, uiStore } = useContext(StoreContext);
   const tokenInfoMap = tokenStore.tokenInfoMap;
 
@@ -40,7 +41,8 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
 
   const submitDialog = useCallback(async () => {
     const txs = createApprovals(approvals);
-    const response = await sdk.txs.send({ txs: txs }).catch(() => undefined);
+    // I wouldn't swallow the error here.
+    const response = await sdk.txs.send({ txs }).catch(() => undefined);
     if (response?.safeTxHash) {
       setSuccess(true);
     }
@@ -88,6 +90,7 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                         ]}
                         activeItemId={approval.inputMode}
                         onItemClick={(id) => {
+                          // If you move the items out of the render, you will be able to type them and not need cast them.
                           approval.setInputMode(id as 'revoke' | 'unlimited' | 'custom');
                         }}
                       />
@@ -105,7 +108,7 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                           const newValue = event.target.value;
                           approval.setEditedAmount(newValue);
                         }}
-                      ></TextFieldInput>
+                      />
                     </FlexRowWrapper>
                   </ColumnGrid>
                 );
@@ -119,7 +122,8 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
           )}
         </div>
       }
+      // This will also spread `onCancel`. Do you want to?
       {...props}
-    ></GenericModal>
+    />
   );
 });

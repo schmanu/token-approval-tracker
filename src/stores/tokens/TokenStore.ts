@@ -1,3 +1,4 @@
+import SafeServiceClient from '@gnosis.pm/safe-service-client';
 import { action, makeObservable, observable } from 'mobx';
 
 import { reduceToSet } from '../../utils/arrayReducers';
@@ -26,10 +27,10 @@ export class TokenStore {
     });
   }
 
-  loadTokenInfo = (approvalTransactions: AccumulatedApproval[], network: number) => {
+  loadTokenInfo = (approvalTransactions: AccumulatedApproval[], safeServiceClient: SafeServiceClient) => {
     const uniqueTokenAddresses = reduceToSet(approvalTransactions, (value) => value.tokenAddress);
     const promisedTokens = Array.from(uniqueTokenAddresses.values()).map((tokenAddress) =>
-      fetchTokenInfo(tokenAddress, network),
+      fetchTokenInfo(tokenAddress, safeServiceClient),
     );
     Promise.all(promisedTokens)
       .then((tokenResults) => {

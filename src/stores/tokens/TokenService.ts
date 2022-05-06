@@ -1,21 +1,12 @@
-import { networkInfo } from '../../networks';
+import SafeServiceClient from '@gnosis.pm/safe-service-client';
 
-import { TokenInfo } from './TokenStore';
-
-export const fetchTokenInfo = async (tokenAddress: string, network: number) => {
-  const baseAPIURL = networkInfo.get(network)?.baseAPI;
-
-  if (!baseAPIURL) {
+export const fetchTokenInfo = async (tokenAddress: string, safeServiceClient: SafeServiceClient) => {
+  if (!safeServiceClient) {
     return undefined;
   } else {
-    return await fetch(`${baseAPIURL}/tokens/${tokenAddress}/`)
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json() as Promise<TokenInfo>;
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .catch(() => undefined);
+    return await safeServiceClient.getToken(tokenAddress).catch((reason) => {
+      console.error(reason);
+      return undefined;
+    });
   }
 };

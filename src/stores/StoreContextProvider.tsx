@@ -4,6 +4,7 @@ import { observable, reaction } from 'mobx';
 import { createContext, ReactElement, useEffect } from 'react';
 
 import { StoreLoader } from '../components/StoreLoader';
+import { useSafeServiceClient } from '../hooks/useSafeCoreSdk';
 
 import { TokenStore } from './tokens/TokenStore';
 import { TransactionStore } from './transactions/TransactionStore';
@@ -44,6 +45,7 @@ export const StoreContextProvider = (props: {
   stores: { transactionStore: TransactionStore; tokenStore: TokenStore; uiStore: UIStore };
 }) => {
   const { safe, sdk } = useSafeAppsSDK();
+  const safeServiceCLient = useSafeServiceClient();
   const { transactionStore, tokenStore, uiStore } = props.stores;
 
   const { fetchApprovals } = transactionStore;
@@ -52,13 +54,14 @@ export const StoreContextProvider = (props: {
   }, [fetchApprovals, safe, sdk]);
 
   useEffect(() => {
-    reaction(
-      () => transactionStore.approvalTransactions,
-      (approvals) => {
-        tokenStore.loadTokenInfo(approvals, safe.chainId);
-      },
-    );
-
+    if (safeServiceCLient) {
+      reaction(
+        () => transactionStore.approvalTransactions,
+        (approvals) => {
+          tokenStore.loadTokenInfo(approvals, safeServiceCLient);
+        },
+      );
+    }
     reaction(
       () => ({ tokenInfoMap: tokenStore.tokenInfoMap, approvalTransactions: transactionStore.approvalTransactions }),
       (data) => {
@@ -75,10 +78,11 @@ export const StoreContextProvider = (props: {
         uiStore.setApprovals(uiApprovals);
       },
     );
+
     // reaction is a reactive function from mobx and will rerender on changes to the stores.
     // calling it twice using useEffect will cause too many reactions.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [safe.chainId]);
+  }, [safe.chainId, safeServiceCLient]);
 
   return (
     <StoreContext.Provider value={{ transactionStore, tokenStore, uiStore }}>

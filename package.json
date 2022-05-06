@@ -6,7 +6,10 @@
     "@gnosis.pm/safe-apps-provider": "0.10.1",
     "@gnosis.pm/safe-apps-react-sdk": "4.2.1",
     "@gnosis.pm/safe-apps-sdk": "7.0.0",
+    "@gnosis.pm/safe-core-sdk": "^2.1.0",
+    "@gnosis.pm/safe-ethers-lib": "^1.1.0",
     "@gnosis.pm/safe-react-components": "^0.9.7",
+    "@gnosis.pm/safe-service-client": "^1.1.2",
     "@material-ui/core": "4.X.X",
     "@material-ui/styles": "^4.11.4",
     "@mui/x-data-grid": "^4.X.X",
@@ -20,10 +23,10 @@
     "styled-components": "5.x.x"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
     "lint": "eslint --max-warnings 0 .",
-    "test": "react-scripts test",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "generate-types": "typechain --target=ethers-v5 --out-dir src/contracts './node_modules/@openzeppelin/contracts/build/contracts/ERC20.json'",
     "postinstall": "yarn generate-types"
@@ -52,7 +55,10 @@
     "@types/react": "^17.0.30",
     "@types/react-dom": "^17.0.0",
     "@types/styled-components": "^5.1.2",
+    "assert": "^2.0.0",
     "babel-eslint": "^10.1.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-react-app": "^7.0.0",
     "eslint-plugin-flowtype": "^5.9.2",
@@ -60,10 +66,17 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
     "prettier": "^2.4.1",
+    "process": "^0.11.10",
+    "react-app-rewired": "^2.2.1",
     "react-scripts": "^5.0.0",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
     "typechain": "^7.0.0",
-    "typescript": "^4.4.4"
+    "typescript": "^4.4.4",
+    "url": "^0.11.0"
   },
   "resolutions": {
     "react-scripts/**/async": ">=2.6.4"

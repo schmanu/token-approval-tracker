@@ -4,9 +4,7 @@ import { hexZeroPad, LogDescription } from 'ethers/lib/utils';
 
 import { getAllowance } from '../../actions/allowance';
 import { ERC20__factory } from '../../contracts';
-import { networkInfo } from '../../networks';
 import { reduceToMap } from '../../utils/arrayReducers';
-import { TokenInfo } from '../tokens/TokenStore';
 
 import { AccumulatedApproval } from './TransactionStore';
 
@@ -87,24 +85,4 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
     }
   }
   return result;
-};
-
-export const fetchTokenInfo = async (tokenAddress: string, network: number) => {
-  const baseAPIURL = networkInfo.get(network)?.baseAPI;
-
-  if (!baseAPIURL) {
-    return undefined;
-  } else {
-    return await fetch(`${baseAPIURL}/tokens/${tokenAddress}/`)
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json() as Promise<TokenInfo>;
-        } else {
-          throw Error(response.statusText);
-        }
-      })
-      .catch((reason) => {
-        console.error(`Error while loading token info for address ${tokenAddress}: ${reason}`);
-      });
-  }
 };

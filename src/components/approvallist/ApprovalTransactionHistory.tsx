@@ -27,7 +27,7 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
     <AccordionDetails>
       <AccordionDetailsContainer>
         {transactions.map((tx) => (
-          <>
+          <div key={tx.txHash}>
             <ColumnGrid key={tx.txHash}>
               <FlexRowWrapper></FlexRowWrapper>
               <FlexRowWrapper>
@@ -56,7 +56,7 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
               </FlexRowWrapper>
             </ColumnGrid>
             <Divider orientation="horizontal" />
-          </>
+          </div>
         ))}
       </AccordionDetailsContainer>
     </AccordionDetails>

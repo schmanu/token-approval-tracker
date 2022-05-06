@@ -17,7 +17,7 @@ export const ApprovalList = observer(() => {
     <>
       <ApprovalHeader />
       {approvals?.map((approval) => (
-        <ApprovalEntry approval={approval} />
+        <ApprovalEntry key={approval.id} approval={approval} />
       ))}
       <Button
         variant={uiStore.selectedApprovals.length === 0 ? 'bordered' : 'contained'}

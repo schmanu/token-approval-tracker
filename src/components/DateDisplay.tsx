@@ -11,7 +11,7 @@ const toDayString = (day: number) =>
 
 const Wrapper = styled.div`
   display: flex;
-  flexdirection: row;
+  flex-direction: row;
   gap: 4px;
   font-family: 'Averta';
   font-size: 14px;

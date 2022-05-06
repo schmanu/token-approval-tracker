@@ -1,7 +1,7 @@
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { observable, reaction } from 'mobx';
-import { createContext, ReactElement, useEffect } from 'react';
+import { createContext, ReactElement, useContext, useEffect } from 'react';
 
 import { StoreLoader } from '../components/StoreLoader';
 import { useSafeServiceClient } from '../hooks/useSafeCoreSdk';
@@ -90,3 +90,5 @@ export const StoreContextProvider = (props: {
     </StoreContext.Provider>
   );
 };
+
+export const useStore = () => useContext(StoreContext);

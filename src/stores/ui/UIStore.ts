@@ -68,17 +68,19 @@ export class UIApprovalEntry {
     this.editedAmount = editedAmount;
   };
 
-  setInputMode = (inputMode: 'custom' | 'unlimited' | 'revoke') => {
-    this.inputMode = inputMode;
-    switch (inputMode) {
-      case 'custom':
-        break;
-      case 'revoke':
-        this.editedAmount = '0';
-        break;
-      case 'unlimited':
-        this.editedAmount = fromWei(UNLIMITED_ALLOWANCE, this.decimals).toFixed();
-        break;
+  setInputMode = (inputMode: string) => {
+    if (isValidInputMode(inputMode)) {
+      this.inputMode = inputMode;
+      switch (inputMode) {
+        case 'custom':
+          break;
+        case 'revoke':
+          this.editedAmount = '0';
+          break;
+        case 'unlimited':
+          this.editedAmount = fromWei(UNLIMITED_ALLOWANCE, this.decimals).toFixed();
+          break;
+      }
     }
   };
 }
@@ -130,3 +132,7 @@ export class UIStore {
     });
   };
 }
+
+const isValidInputMode = (mode: string): mode is 'custom' | 'unlimited' | 'revoke' => {
+  return mode === 'custom' || mode === 'unlimited' || mode === 'revoke';
+};

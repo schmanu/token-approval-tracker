@@ -9,7 +9,7 @@ export const getAllowance = async (
   tokenAddress: string,
   spenderAddress: string,
   provider: SafeAppProvider,
-): Promise<BigNumber | undefined> => {
+): Promise<BigNumber | void> => {
   const web3 = new ethers.providers.Web3Provider(provider);
   const contract = ERC20__factory.connect(tokenAddress, web3);
   return await contract
@@ -18,6 +18,5 @@ export const getAllowance = async (
     .then((allowance) => new BigNumber(allowance))
     .catch((error) => {
       console.log(`Error while fetching approval: ${error}`);
-      return undefined;
     });
 };

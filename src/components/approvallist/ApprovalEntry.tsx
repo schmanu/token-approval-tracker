@@ -13,9 +13,7 @@ interface ApprovalEntryProps {
   approval: UIApprovalEntry;
 }
 
-export const ApprovalEntry: React.FC<ApprovalEntryProps> = observer((props) => {
-  const { approval } = props;
-
+export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
   const { tokenStore } = useContext(StoreContext);
   const tokenMap = tokenStore.tokenInfoMap;
 
@@ -30,7 +28,10 @@ export const ApprovalEntry: React.FC<ApprovalEntryProps> = observer((props) => {
                 checked={approval.selected}
                 label=""
                 name="markedForChange"
-                onChange={approval.toggleSelected}
+                onChange={(event) => {
+                  event?.stopPropagation();
+                  approval.toggleSelected();
+                }}
               />
             </div>
           </FlexRowWrapper>

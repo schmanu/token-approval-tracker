@@ -2,11 +2,11 @@ import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { Button, EthHashInfo, GenericModal, TextFieldInput, Text, Select } from '@gnosis.pm/safe-react-components';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import { useCallback, useContext, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import { createApprovals } from '../actions/approvals';
-import { StoreContext } from '../stores/StoreContextProvider';
+import { useStore } from '../stores/StoreContextProvider';
 
 type ApprovalDialogProps = {
   onCancel: () => void;
@@ -28,8 +28,23 @@ const FlexRowWrapper = styled.div`
   border-bottom: 1px solid #ddd;
 `;
 
+const changeApprovalItems: { id: 'revoke' | 'unlimited' | 'custom'; label: string }[] = [
+  {
+    id: 'revoke',
+    label: 'Revoke',
+  },
+  {
+    id: 'unlimited',
+    label: 'Unlimited',
+  },
+  {
+    id: 'custom',
+    label: 'Custom',
+  },
+];
+
 export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
-  const { tokenStore, uiStore } = useContext(StoreContext);
+  const { tokenStore, uiStore } = useStore();
   const tokenInfoMap = tokenStore.tokenInfoMap;
 
   const approvals = uiStore.selectedApprovals;
@@ -40,7 +55,9 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
 
   const submitDialog = useCallback(async () => {
     const txs = createApprovals(approvals);
-    const response = await sdk.txs.send({ txs: txs }).catch(() => undefined);
+    const response = await sdk.txs.send({ txs: txs }).catch((reason) => {
+      console.error(`Transaction could not be sent: ${reason}`);
+    });
     if (response?.safeTxHash) {
       setSuccess(true);
     }
@@ -72,23 +89,10 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                     </FlexRowWrapper>
                     <FlexRowWrapper>
                       <Select
-                        items={[
-                          {
-                            id: 'revoke',
-                            label: 'Revoke',
-                          },
-                          {
-                            id: 'unlimited',
-                            label: 'Unlimited',
-                          },
-                          {
-                            id: 'custom',
-                            label: 'Custom',
-                          },
-                        ]}
+                        items={changeApprovalItems}
                         activeItemId={approval.inputMode}
                         onItemClick={(id) => {
-                          approval.setInputMode(id as 'revoke' | 'unlimited' | 'custom');
+                          approval.setInputMode(id);
                         }}
                       />
                       <TextFieldInput
@@ -105,7 +109,7 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                           const newValue = event.target.value;
                           approval.setEditedAmount(newValue);
                         }}
-                      ></TextFieldInput>
+                      />
                     </FlexRowWrapper>
                   </ColumnGrid>
                 );
@@ -119,7 +123,6 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
           )}
         </div>
       }
-      {...props}
-    ></GenericModal>
+    />
   );
 });

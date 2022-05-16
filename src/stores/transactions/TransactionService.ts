@@ -1,39 +1,38 @@
 import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
 import { ethers } from 'ethers';
-import { hexZeroPad, LogDescription } from 'ethers/lib/utils';
+import { hexZeroPad } from 'ethers/lib/utils';
 
 import { getAllowance } from '../../actions/allowance';
-import { ERC20__factory } from '../../contracts';
 import { reduceToMap } from '../../utils/arrayReducers';
 
 import { AccumulatedApproval } from './TransactionStore';
 
-interface TransactionLog {
+type TransactionLog = ethers.providers.Log & {
   tokenAddress: string;
   txHash: string;
   blockHash: string;
   timestamp: number;
-  parsedLog: LogDescription;
-}
+};
 
 export const fetchApprovalsOnChain: (
   safeAddress: string,
   safeAppProvider: SafeAppProvider,
 ) => Promise<TransactionLog[]> = async (safeAddress, safeAppProvider) => {
   const web3Provider = new ethers.providers.Web3Provider(safeAppProvider);
-  const contractInterface = new ethers.utils.Interface(ERC20__factory.abi);
   const approvalLogs = await web3Provider
     .getLogs({
       fromBlock: 0,
       toBlock: 'latest',
       topics: [ethers.utils.id('Approval(address,address,uint256)'), hexZeroPad(safeAddress, 32)],
     })
+    // We filter out mismatching Approval events like ERC721 approvals
+    .then((logs) => logs.filter((log) => log.topics.length === 3))
     .then((logs) =>
       logs.map((log) => ({
+        ...log,
         tokenAddress: log.address,
         txHash: log.transactionHash,
         blockHash: log.blockHash,
-        parsedLog: contractInterface.parseLog(log),
       })),
     );
 
@@ -65,7 +64,7 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
   for (const tokenEntry of transactionsByToken.entries()) {
     const transactions = tokenEntry[1];
     const transactionsBySpender = reduceToMap(transactions, (tx) => {
-      return tx.parsedLog.args[1] as string;
+      return `0x${tx.topics[2].slice(26)}`;
     });
 
     for (const spenderEntry of transactionsBySpender.entries()) {
@@ -78,7 +77,7 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
           transactions: spenderEntry[1].map((tx) => ({
             executionDate: tx.timestamp * 1000, // millis
             txHash: tx.txHash,
-            value: (tx.parsedLog.args[2] as ethers.BigNumber).toHexString(),
+            value: tx.data,
           })),
         });
       }

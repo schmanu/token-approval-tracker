@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 
 import { ERC20__factory } from '../contracts';
 import { toWei } from '../utils/wei';
+export const ERROR_CAUSING_SPENDER = '0x7d9a7d9c72e2905b8f6cc866f33c594895df6c6c';
 
 const erc20Interface = ERC20__factory.createInterface();
 
@@ -59,6 +60,8 @@ interface MockApprovalData {
   timeStamp: number;
 }
 
+type LogReturnType = 'generated' | 'bugReportLog';
+
 const createMockApprovalLogEntries = (dataArray: MockApprovalData[] | undefined, decimals?: number) => {
   const result =
     dataArray?.map((data) => ({
@@ -83,7 +86,7 @@ export const createMockSafeAppProvider: (returnData: {
   decimals?: number;
   allowance?: BigNumber;
   approvalLogs?: MockApprovalData[];
-  returnErrorEntry?: boolean;
+  logReturnType?: LogReturnType;
 }) => SafeAppProvider = (returnData) => {
   return {
     request: async (request: { method: string; params?: any[] }) => {
@@ -105,6 +108,11 @@ export const createMockSafeAppProvider: (returnData: {
                 break;
               case 'allowance':
                 if (typeof returnData.decimals !== 'undefined' && typeof returnData.allowance !== 'undefined') {
+                  const decoded = erc20Interface.decodeFunctionData('allowance', data);
+                  const spender = decoded['spender'] as string;
+                  if (spender.toLowerCase() === ERROR_CAUSING_SPENDER.toLowerCase()) {
+                    return Promise.reject('Invalid spender address');
+                  }
                   return Promise.resolve(
                     ethers.utils.defaultAbiCoder.encode(
                       ['uint256'],
@@ -116,7 +124,7 @@ export const createMockSafeAppProvider: (returnData: {
           }
           break;
         case 'eth_getLogs':
-          if (returnData.returnErrorEntry) {
+          if (returnData.logReturnType === 'bugReportLog') {
             return Promise.resolve(errorLogEntry);
           }
           return Promise.resolve(createMockApprovalLogEntries(returnData.approvalLogs));

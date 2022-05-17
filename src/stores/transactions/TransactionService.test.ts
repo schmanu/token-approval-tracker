@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
 
-import { createMockSafeAppProvider } from '../../testutils/utils';
+import { createMockSafeAppProvider, ERROR_CAUSING_SPENDER } from '../../testutils/utils';
 import { toWei } from '../../utils/wei';
 
 import { fetchApprovalTransactions } from './TransactionService';
@@ -15,7 +15,7 @@ const tokenAddress2 = '0x0000000000000000000000000000000000000002';
 const safeAddress = '0x54F3000000000000000000000000000000000000';
 
 describe('TransactionStore', () => {
-  test('Empty Transaction History', () => {
+  test('should work for empty logs', () => {
     const safeProvider = createMockSafeAppProvider({
       allowance: new BigNumber(69),
       decimals: 18,
@@ -29,7 +29,7 @@ describe('TransactionStore', () => {
    * Single Approve Transaction which gave an Approval of 69.
    * The remaining allowance of this spender / token is 42.
    */
-  test('Single Approve Transaction', async () => {
+  test('parses a single approval log entry', async () => {
     const safeProvider = createMockSafeAppProvider({
       allowance: new BigNumber(42),
       decimals: 18,
@@ -58,7 +58,43 @@ describe('TransactionStore', () => {
     );
   });
 
-  test('Multiple Approve Transaction', async () => {
+  test('skips faulty log entries and continues parsing', async () => {
+    const safeProvider = createMockSafeAppProvider({
+      allowance: new BigNumber(42),
+      decimals: 18,
+      approvalLogs: [
+        {
+          tokenAddress: tokenAddress2,
+          allowance: new BigNumber(69),
+          ownerAddress: ethers.utils.hexZeroPad(safeAddress, 32),
+          spenderAddress: ethers.utils.hexZeroPad(ERROR_CAUSING_SPENDER, 32),
+          timeStamp: 1,
+        },
+        {
+          tokenAddress,
+          allowance: new BigNumber(69),
+          ownerAddress: ethers.utils.hexZeroPad(safeAddress, 32),
+          spenderAddress: ethers.utils.hexZeroPad(spenderAddress, 32),
+          timeStamp: 2,
+        },
+      ],
+    });
+
+    const approvalsTxs = await fetchApprovalTransactions(safeAddress, safeProvider);
+
+    expect(approvalsTxs).toHaveLength(1);
+    expect(approvalsTxs[0].allowance).toBe(toWei(42, 18).toFixed());
+    expect(approvalsTxs[0].spender).toBe(spenderAddress);
+    expect(approvalsTxs[0].tokenAddress).toBe(tokenAddress);
+    expect(approvalsTxs[0].transactions).toHaveLength(1);
+    expect(approvalsTxs[0].transactions[0].txHash).toBe(ethers.utils.hexZeroPad('0x2', 32));
+    expect(approvalsTxs[0].transactions[0].executionDate).toBe(2000);
+    expect(approvalsTxs[0].transactions[0].value).toBe(
+      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())), 32),
+    );
+  });
+
+  test('parses multiple approval log entries', async () => {
     const safeProvider = createMockSafeAppProvider({
       allowance: new BigNumber(0),
       decimals: 18,
@@ -105,12 +141,12 @@ describe('TransactionStore', () => {
     );
   });
 
-  test('log from bugreport that should not cause an error', async () => {
+  test('can parse the log entries from a bug report', async () => {
     const safeProvider = createMockSafeAppProvider({
       allowance: new BigNumber(42),
       decimals: 18,
       approvalLogs: undefined,
-      returnErrorEntry: true,
+      logReturnType: 'bugReportLog',
     });
 
     const approvals = await fetchApprovalTransactions(safeAddress, safeProvider);

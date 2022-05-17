@@ -54,7 +54,7 @@ describe('TransactionStore', () => {
     expect(approvalsTxs[0].transactions[0].txHash).toBe(ethers.utils.hexZeroPad('0x1', 32));
     expect(approvalsTxs[0].transactions[0].executionDate).toBe(1000);
     expect(approvalsTxs[0].transactions[0].value).toBe(
-      ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())),
+      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())), 32),
     );
   });
 
@@ -91,7 +91,7 @@ describe('TransactionStore', () => {
     expect(approvalsTxs[0].transactions[0].txHash).toBe(ethers.utils.hexZeroPad(ethers.utils.hexlify(321), 32));
     expect(approvalsTxs[0].transactions[0].executionDate).toBe(321000);
     expect(approvalsTxs[0].transactions[0].value).toBe(
-      ethers.utils.hexlify(ethers.BigNumber.from(toWei(42, 18).toFixed())),
+      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(42, 18).toFixed())), 32),
     );
 
     expect(approvalsTxs[1].allowance).toBe(toWei(0, 18).toFixed());
@@ -101,7 +101,19 @@ describe('TransactionStore', () => {
     expect(approvalsTxs[1].transactions[0].txHash).toBe(ethers.utils.hexZeroPad(ethers.utils.hexlify(123), 32));
     expect(approvalsTxs[1].transactions[0].executionDate).toBe(123000);
     expect(approvalsTxs[1].transactions[0].value).toBe(
-      ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())),
+      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())), 32),
     );
+  });
+
+  test('log from bugreport that should not cause an error', async () => {
+    const safeProvider = createMockSafeAppProvider({
+      allowance: new BigNumber(42),
+      decimals: 18,
+      approvalLogs: undefined,
+      returnErrorEntry: true,
+    });
+
+    const approvals = await fetchApprovalTransactions(safeAddress, safeProvider);
+    expect(approvals).toHaveLength(12);
   });
 });

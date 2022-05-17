@@ -62,25 +62,29 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
 
   const result: AccumulatedApproval[] = [];
   for (const tokenEntry of transactionsByToken.entries()) {
-    const transactions = tokenEntry[1];
-    const transactionsBySpender = reduceToMap(transactions, (tx) => {
-      return `0x${tx.topics[2].slice(26)}`;
-    });
+    try {
+      const transactions = tokenEntry[1];
+      const transactionsBySpender = reduceToMap(transactions, (tx) => {
+        return `0x${tx.topics[2].slice(26)}`;
+      });
 
-    for (const spenderEntry of transactionsBySpender.entries()) {
-      const allowance = await getAllowance(safeAddress, tokenEntry[0], spenderEntry[0], safeAppProvider);
-      if (typeof allowance !== 'undefined') {
-        result.push({
-          spender: spenderEntry[0],
-          tokenAddress: tokenEntry[0],
-          allowance: allowance.toFixed(),
-          transactions: spenderEntry[1].map((tx) => ({
-            executionDate: tx.timestamp * 1000, // millis
-            txHash: tx.txHash,
-            value: tx.data,
-          })),
-        });
+      for (const spenderEntry of transactionsBySpender.entries()) {
+        const allowance = await getAllowance(safeAddress, tokenEntry[0], spenderEntry[0], safeAppProvider);
+        if (typeof allowance !== 'undefined') {
+          result.push({
+            spender: spenderEntry[0],
+            tokenAddress: tokenEntry[0],
+            allowance: allowance.toFixed(),
+            transactions: spenderEntry[1].map((tx) => ({
+              executionDate: tx.timestamp * 1000, // millis
+              txHash: tx.txHash,
+              value: tx.data,
+            })),
+          });
+        }
       }
+    } catch (err) {
+      console.info(`Skipping unparsable approval event. ${tokenEntry[0]} is most likely not an ERC20 contract.`);
     }
   }
   return result;

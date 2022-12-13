@@ -47,8 +47,8 @@
   "homepage": "./",
   "devDependencies": {
     "@craco/craco": "^7.0.0",
-    "@openzeppelin/contracts": "^4.4.2",
-    "@testing-library/jest-dom": "^5.11.4",
+    "@openzeppelin/contracts": "^4.7.3",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.1.9",
     "@typechain/ethers-v5": "^9.0.0",
@@ -82,6 +82,9 @@
     "url": "^0.11.0"
   },
   "resolutions": {
-    "react-scripts/**/async": ">=2.6.4"
+    "react-scripts/**/async": ">=2.6.4",
+    "react-scripts/**/@svgr/webpack": ">=6.5.1",
+    "react-scripts/**/loader-utils": ">=2.0.4",
+    "react-scripts/**/terser": ">=5.14.2"
   }
 }

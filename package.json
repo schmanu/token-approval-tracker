@@ -16,6 +16,7 @@
     "@mui/material": "^5.10.15",
     "@mui/x-data-grid": "^4.X.X",
     "bignumber.js": "^9.0.2",
+    "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.6.6",
     "mobx": "^6.5.0",
     "mobx-react": "^7.3.0",
@@ -84,7 +85,6 @@
   "resolutions": {
     "react-scripts/**/async": ">=2.6.4",
     "react-scripts/**/@svgr/webpack": ">=6.5.1",
-    "react-scripts/**/loader-utils": ">=2.0.4",
     "react-scripts/**/terser": ">=5.14.2"
   }
 }

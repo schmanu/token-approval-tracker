@@ -8,6 +8,7 @@ import { StoreContext } from '../../stores/StoreContextProvider';
 import { Transaction } from '../../stores/transactions/TransactionStore';
 import { fromWei } from '../../utils/wei';
 import { DateDisplay } from '../DateDisplay';
+import { EthHashInfo } from '../EthHashInfo';
 
 import { AccordionDetailsContainer, ColumnGrid, FlexRowWrapper } from './Container';
 
@@ -31,7 +32,7 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
               <FlexRowWrapper></FlexRowWrapper>
               <FlexRowWrapper>
                 <Typography variant="subtitle2">TX hash:</Typography>
-                {/* {tx.txHash && <EthHashInfo hash={tx.txHash} shortenHash={4} showCopyBtn />} */}
+                {tx.txHash && <EthHashInfo showAvatar={false} address={tx.txHash} />}
               </FlexRowWrapper>
               <FlexRowWrapper>
                 <Typography variant="subtitle2">Date:</Typography>
@@ -40,9 +41,9 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
               <FlexRowWrapper>
                 <Typography variant="subtitle2">Amount:</Typography>
                 {UNLIMITED_ALLOWANCE.isEqualTo(tx.value ?? 0) ? (
-                  <Typography>Unlimited</Typography>
+                  <Typography variant="body2">Unlimited</Typography>
                 ) : (
-                  <Typography>
+                  <Typography variant="body2">
                     {fromWei(new BigNumber(tx.value ?? 0), tokenMap?.get(tokenAddress)?.decimals ?? 18).toFixed()}
                   </Typography>
                 )}

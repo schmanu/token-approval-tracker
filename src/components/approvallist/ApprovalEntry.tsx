@@ -5,6 +5,7 @@ import { useContext } from 'react';
 import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { StoreContext } from '../../stores/StoreContextProvider';
 import { UIApprovalEntry } from '../../stores/ui/UIStore';
+import { EthHashInfo } from '../EthHashInfo';
 
 import { ApprovalTransactionHistory } from './ApprovalTransactionHistory';
 import { ColumnGrid, FlexRowWrapper } from './Container';
@@ -43,11 +44,11 @@ export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
             />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Typography fontWeight={700}>{tokenMap?.get(approval.tokenAddress)?.symbol}</Typography>
-              {/* TODO add EthHashInfo component <EthHashInfo textSize="sm" hash={approval.tokenAddress} shortenHash={4} showCopyBtn /> */}
+              <EthHashInfo address={approval.tokenAddress} showAvatar={false} />
             </div>
           </FlexRowWrapper>
           <FlexRowWrapper>
-            {/* TODO add EthHashInfo<EthHashInfo hash={approval.spender} shortenHash={4} showAvatar showCopyBtn /> */}
+            <EthHashInfo address={approval.spender} avatarSize={32} />
           </FlexRowWrapper>
           <FlexRowWrapper>
             <Typography fontWeight={700}>

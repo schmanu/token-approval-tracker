@@ -8,6 +8,8 @@ import { useCallback, useState } from 'react';
 import { createApprovals } from '../actions/approvals';
 import { useStore } from '../stores/StoreContextProvider';
 
+import { EthHashInfo } from './EthHashInfo';
+
 type ApprovalDialogProps = {
   onCancel: () => void;
 };
@@ -80,10 +82,10 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                         height={24}
                         alt={tokenInfoMap?.get(approval.tokenAddress)?.symbol}
                       />
-                      {/* <EthHashInfo hash={approval.tokenAddress} shortenHash={4} showCopyBtn /> */}
+                      <EthHashInfo showAvatar={false} address={approval.tokenAddress} />
                     </FlexRowWrapper>
                     <FlexRowWrapper>
-                      {/* <EthHashInfo hash={approval.spender} shortenHash={4} showCopyBtn /> */}
+                      <EthHashInfo avatarSize={32} address={approval.spender} />
                     </FlexRowWrapper>
                     <FlexRowWrapper>
                       <Select

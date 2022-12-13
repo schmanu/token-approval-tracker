@@ -22,11 +22,13 @@ export const DateDisplay = (props: DateDisplayProps) => {
 
   return (
     <Wrapper>
-      <Typography>{toDayString(date.getDate())}</Typography>
-      <Typography>{MONTH_NAMES[date.getMonth()]}</Typography>
-      <Typography>{date.getFullYear()}</Typography>
-      <Typography>-</Typography>
-      <Typography>{`${date.getHours()}:${date.getMinutes() < 10 ? 0 : ''}${date.getMinutes()}`}</Typography>
+      <Typography variant="body2">{toDayString(date.getDate())}</Typography>
+      <Typography variant="body2">{MONTH_NAMES[date.getMonth()]}</Typography>
+      <Typography variant="body2">{date.getFullYear()}</Typography>
+      <Typography variant="body2">-</Typography>
+      <Typography variant="body2">{`${date.getHours()}:${
+        date.getMinutes() < 10 ? 0 : ''
+      }${date.getMinutes()}`}</Typography>
     </Wrapper>
   );
 };

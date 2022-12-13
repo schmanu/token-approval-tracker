@@ -1,6 +1,6 @@
-import { Text } from '@gnosis.pm/safe-react-components';
+import styled from '@emotion/styled';
+import { Typography } from '@mui/material';
 import { ReactElement } from 'react';
-import styled from 'styled-components';
 
 import githublogo from '../static/github.png';
 
@@ -16,7 +16,7 @@ const StyledFooterRow = styled.div`
 export const Footer: () => ReactElement = () => {
   return (
     <StyledFooterRow>
-      <Text size="sm">v{process.env.REACT_APP_VERSION}</Text>
+      <Typography>v{process.env.REACT_APP_VERSION}</Typography>
       <a target="_blank" href="https://github.com/schmanu/token-approval-tracker" rel="noreferrer">
         <img src={githublogo} width={16} height={16} alt="github" />
       </a>

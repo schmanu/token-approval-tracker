@@ -1,6 +1,6 @@
-import { Title, Text, Card } from '@gnosis.pm/safe-react-components';
+import styled from '@emotion/styled';
+import { Card, Typography } from '@mui/material';
 import React from 'react';
-import styled from 'styled-components';
 
 import { ApprovalLoader } from './components/ApprovalLoader';
 import { Footer } from './components/Footer';
@@ -10,14 +10,6 @@ import { StoreContextProvider } from './stores/StoreContextProvider';
 import { TokenStore } from './stores/tokens/TokenStore';
 import { TransactionStore } from './stores/transactions/TransactionStore';
 import { UIStore } from './stores/ui/UIStore';
-
-const Container = styled.div`
-  padding: 1rem;
-  padding-top: 0rem;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
 
 const HeaderWrapper = styled.div`
   padding: 1rem;
@@ -40,23 +32,23 @@ const uiStore = new UIStore();
 
 const SafeApp = (): React.ReactElement => {
   return (
-    <Container>
+    <Card sx={{ height: '100vh', backgroundColor: ({ palette }) => palette.background.default }}>
       <HeaderWrapper>
         <Row>
           <img src={`${process.env.PUBLIC_URL}/logo.svg`} width={64} height={64} alt="Logo"></img>
-          <Title size="xl">Token Approval Manager</Title>
+          <Typography variant="h1">Token Approval Manager</Typography>
         </Row>
-        <Text size="xl">✅ Keep track of all your token approvals.</Text>
-        <Text size="xl">✍️ Edit / Revoke multiple approvals in a single transaction.</Text>
+        <Typography>✅ Keep track of all your token approvals.</Typography>
+        <Typography>✍️ Edit / Revoke multiple approvals in a single transaction.</Typography>
       </HeaderWrapper>
-      <Card>
+      <Card sx={{ margin: 2, padding: '16px 32px' }} elevation={0}>
         <StoreContextProvider stores={{ tokenStore, transactionStore, uiStore }} loading={<ApprovalLoader />}>
           <ApprovalList />
         </StoreContextProvider>
       </Card>
       <FAQSection />
       <Footer />
-    </Container>
+    </Card>
   );
 };
 

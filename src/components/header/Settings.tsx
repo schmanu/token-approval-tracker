@@ -1,7 +1,9 @@
-import { Checkbox, Icon, Tooltip } from '@gnosis.pm/safe-react-components';
+import styled from '@emotion/styled';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { Checkbox, Tooltip, FormGroup, FormControlLabel } from '@mui/material';
+import { styled as muiStyled } from '@mui/system';
 import { observer } from 'mobx-react';
 import { ReactElement, useContext, useState } from 'react';
-import styled from 'styled-components';
 
 import { StoreContext } from '../../stores/StoreContextProvider';
 
@@ -17,16 +19,22 @@ export const Settings: () => ReactElement = observer(() => {
       {isOpen && (
         <StyledSettingsOverlay>
           <StyledSettingsRow>
-            <Checkbox
-              name="hideRevokedApprovals"
-              checked={uiStore.hideRevokedApprovals}
-              label="Hide revoked"
-              onChange={uiStore.toggleHideRevokedApprovals}
-            />
+            <FormGroup>
+              <FormGroup>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      name="hideRevokedApprovals"
+                      checked={uiStore.hideRevokedApprovals}
+                      onChange={uiStore.toggleHideRevokedApprovals}
+                    />
+                  }
+                  label="Hide revoked"
+                />
+              </FormGroup>
+            </FormGroup>
             <Tooltip title="Approvals with allowance 0 will be hidden">
-              <span>
-                <Icon size="md" type="question" />
-              </span>
+              <HelpOutlineIcon />
             </Tooltip>
           </StyledSettingsRow>
         </StyledSettingsOverlay>
@@ -46,18 +54,18 @@ const StyledSettingsRow = styled.div`
   align-items: center;
 `;
 
-const StyledSettingsOverlay = styled.span`
-  display: flex;
-  flex-direction: column;
-  background-color: #fff;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 0 10px 0 rgba(33, 48, 77, 0.1);
-  box-sizing: border-box;
-  position: absolute;
-  right: 0rem;
-  top: 1.75rem;
-  z-index: 999;
-  width: 200px;
-  padding: 1rem;
-`;
+const StyledSettingsOverlay = muiStyled('span')(({ theme }) => ({
+  flexDirection: 'column',
+  backgroundColor: theme.palette.background.default,
+  border: 'none',
+  borderRadius: '6px',
+  boxShadow: '0 0 10px 0 rgba(33, 48, 77, 0.1)',
+  boxSizing: 'border-box',
+  position: 'absolute',
+  right: '0rem',
+  top: '3rem',
+  zIndex: 999,
+  width: '200px',
+  padding: '1rem',
+  display: 'flex',
+}));

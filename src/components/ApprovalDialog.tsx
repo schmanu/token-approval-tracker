@@ -1,9 +1,9 @@
+import styled from '@emotion/styled';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { Button, EthHashInfo, GenericModal, TextFieldInput, Text, Select } from '@gnosis.pm/safe-react-components';
+import { Button, Dialog, DialogContent, MenuItem, Select, TextField, Typography } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useCallback, useState } from 'react';
-import styled from 'styled-components';
 
 import { createApprovals } from '../actions/approvals';
 import { useStore } from '../stores/StoreContextProvider';
@@ -64,10 +64,8 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
   }, [approvals, sdk.txs]);
 
   return (
-    <GenericModal
-      onClose={props.onCancel}
-      title="Edit / Revoke Approvals"
-      body={
+    <Dialog onClose={props.onCancel} title="Edit / Revoke Approvals" open={true}>
+      <DialogContent>
         <div>
           {!success ? (
             <div>
@@ -82,20 +80,23 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                         height={24}
                         alt={tokenInfoMap?.get(approval.tokenAddress)?.symbol}
                       />
-                      <EthHashInfo hash={approval.tokenAddress} shortenHash={4} showCopyBtn />
+                      {/* <EthHashInfo hash={approval.tokenAddress} shortenHash={4} showCopyBtn /> */}
                     </FlexRowWrapper>
                     <FlexRowWrapper>
-                      <EthHashInfo hash={approval.spender} shortenHash={4} showCopyBtn />
+                      {/* <EthHashInfo hash={approval.spender} shortenHash={4} showCopyBtn /> */}
                     </FlexRowWrapper>
                     <FlexRowWrapper>
                       <Select
-                        items={changeApprovalItems}
-                        activeItemId={approval.inputMode}
-                        onItemClick={(id) => {
-                          approval.setInputMode(id);
+                        value={approval.inputMode}
+                        onChange={(event) => {
+                          approval.setInputMode(event.target.value);
                         }}
-                      />
-                      <TextFieldInput
+                      >
+                        {changeApprovalItems.map((item) => (
+                          <MenuItem value={item.id}>{item.label}</MenuItem>
+                        ))}
+                      </Select>
+                      <TextField
                         name="amount"
                         disabled={approval.inputMode !== 'custom'}
                         inputMode="decimal"
@@ -103,7 +104,8 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                         label="Approval Amount"
                         variant="outlined"
                         value={approval.editedAmount}
-                        error={amountInDecimals.isNaN() ? 'The value must be a number!' : undefined}
+                        error={amountInDecimals.isNaN()}
+                        helperText={amountInDecimals.isNaN() ? 'The value must be a number!' : undefined}
                         onFocus={(event) => event.target.select()}
                         onChange={(event) => {
                           const newValue = event.target.value;
@@ -114,15 +116,15 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                   </ColumnGrid>
                 );
               })}
-              <Button size="lg" onClick={submitDialog}>
+              <Button variant="contained" onClick={submitDialog}>
                 Submit
               </Button>
             </div>
           ) : (
-            <Text size="xl">Transaction submitted. Check your transactions queue.</Text>
+            <Typography variant="h1">Transaction submitted. Check your transactions queue.</Typography>
           )}
         </div>
-      }
-    />
+      </DialogContent>
+    </Dialog>
   );
 });

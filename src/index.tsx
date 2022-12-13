@@ -1,21 +1,35 @@
 import SafeProvider from '@gnosis.pm/safe-apps-react-sdk';
-import { theme, Loader, Title } from '@gnosis.pm/safe-react-components';
+import { CircularProgress, GlobalStyles, ThemeProvider, Typography } from '@mui/material';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ThemeProvider } from 'styled-components';
 
 import App from './App';
-import GlobalStyle from './GlobalStyle';
+import initTheme from './theme';
+
+const isSystemDarkMode = (): boolean => {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+};
+
+const theme = initTheme(isSystemDarkMode());
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <GlobalStyle />
+      <GlobalStyles
+        styles={{
+          body: {
+            height: '100%',
+            margin: '0px',
+            padding: '0px',
+          },
+        }}
+      />
       <SafeProvider
         loader={
           <>
-            <Title size="md">Waiting for Safe...</Title>
-            <Loader size="md" />
+            <Typography variant="h1">Waiting for Safe...</Typography>
+            <CircularProgress size="md" />
           </>
         }
       >

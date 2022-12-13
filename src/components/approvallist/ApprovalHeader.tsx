@@ -1,7 +1,7 @@
-import { Title, Checkbox, Text } from '@gnosis.pm/safe-react-components';
+import styled from '@emotion/styled';
+import { Checkbox, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
-import styled from 'styled-components';
 
 import { StoreContext } from '../../stores/StoreContextProvider';
 import { Settings } from '../header/Settings';
@@ -21,7 +21,7 @@ export const ApprovalHeader = observer(() => {
   return (
     <>
       <StyledFirstRow>
-        <Title size="md">Approvals</Title>
+        <Typography variant="h3">Approvals</Typography>
         <Settings />
       </StyledFirstRow>
       <ColumnGrid
@@ -29,14 +29,12 @@ export const ApprovalHeader = observer(() => {
           paddingLeft: 22,
           paddingRight: 44,
           minHeight: 48,
-          borderBottom: '2px solid #E8E7E6',
           width: 'inherit',
         }}
       >
         <FlexRowWrapper>
           <Checkbox
             checked={uiStore.allSelected}
-            label=""
             name="checkAll"
             onChange={(event, checked) => {
               uiStore.selectAll(checked);
@@ -44,19 +42,13 @@ export const ApprovalHeader = observer(() => {
           />
         </FlexRowWrapper>
         <FlexRowWrapper>
-          <Text size="xl" strong>
-            Token
-          </Text>
+          <Typography fontWeight={700}>Token</Typography>
         </FlexRowWrapper>
         <FlexRowWrapper>
-          <Text size="xl" strong>
-            Spender
-          </Text>
+          <Typography fontWeight={700}>Spender</Typography>
         </FlexRowWrapper>
         <FlexRowWrapper>
-          <Text size="xl" strong>
-            Current Allowance
-          </Text>
+          <Typography fontWeight={700}>Current Allowance</Typography>
         </FlexRowWrapper>
       </ColumnGrid>
     </>

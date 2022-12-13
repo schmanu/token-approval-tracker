@@ -1,4 +1,5 @@
-import styled from 'styled-components';
+import styled from '@emotion/styled';
+import { Typography } from '@mui/material';
 
 interface DateDisplayProps {
   value: string | number;
@@ -13,26 +14,19 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   gap: 4px;
-  font-family: 'Averta';
   font-size: 14px;
 `;
-
-const TimeField = styled.p``;
-const DayField = styled.p``;
-const MonthField = styled.p``;
-const YearField = styled.p``;
-
 export const DateDisplay = (props: DateDisplayProps) => {
   const { value } = props;
   const date = new Date(value);
 
   return (
     <Wrapper>
-      <DayField>{toDayString(date.getDate())}</DayField>
-      <MonthField>{MONTH_NAMES[date.getMonth()]}</MonthField>
-      <YearField>{date.getFullYear()}</YearField>
-      <p>-</p>
-      <TimeField>{`${date.getHours()}:${date.getMinutes() < 10 ? 0 : ''}${date.getMinutes()}`}</TimeField>
+      <Typography>{toDayString(date.getDate())}</Typography>
+      <Typography>{MONTH_NAMES[date.getMonth()]}</Typography>
+      <Typography>{date.getFullYear()}</Typography>
+      <Typography>-</Typography>
+      <Typography>{`${date.getHours()}:${date.getMinutes() < 10 ? 0 : ''}${date.getMinutes()}`}</Typography>
     </Wrapper>
   );
 };

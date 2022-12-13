@@ -1,5 +1,4 @@
-import { EthHashInfo, AccordionDetails, Divider, Text } from '@gnosis.pm/safe-react-components';
-import {} from '@material-ui/core';
+import { AccordionDetails, Typography } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
@@ -31,31 +30,24 @@ export const ApprovalTransactionHistory: React.FC<ApprovalTransactionHistoryProp
             <ColumnGrid key={tx.txHash}>
               <FlexRowWrapper></FlexRowWrapper>
               <FlexRowWrapper>
-                <Text size="lg" strong>
-                  TX hash:
-                </Text>
-                {tx.txHash && <EthHashInfo hash={tx.txHash} shortenHash={4} showCopyBtn />}
+                <Typography variant="subtitle2">TX hash:</Typography>
+                {/* {tx.txHash && <EthHashInfo hash={tx.txHash} shortenHash={4} showCopyBtn />} */}
               </FlexRowWrapper>
               <FlexRowWrapper>
-                <Text size="lg" strong>
-                  Date:
-                </Text>
+                <Typography variant="subtitle2">Date:</Typography>
                 {tx.executionDate && <DateDisplay value={tx.executionDate} />}
               </FlexRowWrapper>
               <FlexRowWrapper>
-                <Text size="lg" strong>
-                  Amount:
-                </Text>
+                <Typography variant="subtitle2">Amount:</Typography>
                 {UNLIMITED_ALLOWANCE.isEqualTo(tx.value ?? 0) ? (
-                  <Text size="lg">Unlimited</Text>
+                  <Typography>Unlimited</Typography>
                 ) : (
-                  <Text size="lg">
+                  <Typography>
                     {fromWei(new BigNumber(tx.value ?? 0), tokenMap?.get(tokenAddress)?.decimals ?? 18).toFixed()}
-                  </Text>
+                  </Typography>
                 )}
               </FlexRowWrapper>
             </ColumnGrid>
-            <Divider orientation="horizontal" />
           </div>
         ))}
       </AccordionDetailsContainer>

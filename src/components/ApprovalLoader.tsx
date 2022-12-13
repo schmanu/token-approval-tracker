@@ -1,5 +1,5 @@
-import { Loader, Text } from '@gnosis.pm/safe-react-components';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
+import { CircularProgress, Typography } from '@mui/material';
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,7 +13,7 @@ const Wrapper = styled.div`
 
 export const ApprovalLoader = () => (
   <Wrapper>
-    <Text size="xl">Loading Approvals</Text>
-    <Loader size="lg" />
+    <Typography variant="h1">Loading Approvals</Typography>
+    <CircularProgress size="lg" />
   </Wrapper>
 );

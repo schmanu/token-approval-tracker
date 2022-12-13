@@ -1,4 +1,4 @@
-import { EthHashInfo, Accordion, AccordionSummary, Checkbox, Text } from '@gnosis.pm/safe-react-components';
+import { Accordion, AccordionSummary, Checkbox, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
 
@@ -26,7 +26,6 @@ export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
             <div onClick={(event) => event.stopPropagation()} style={{ width: 0 }}>
               <Checkbox
                 checked={approval.selected}
-                label=""
                 name="markedForChange"
                 onChange={(event) => {
                   event?.stopPropagation();
@@ -43,25 +42,19 @@ export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
               alt={tokenMap?.get(approval.tokenAddress)?.symbol}
             />
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <Text size="lg" strong>
-                {tokenMap?.get(approval.tokenAddress)?.symbol}
-              </Text>
-              <EthHashInfo textSize="sm" hash={approval.tokenAddress} shortenHash={4} showCopyBtn />
+              <Typography fontWeight={700}>{tokenMap?.get(approval.tokenAddress)?.symbol}</Typography>
+              {/* TODO add EthHashInfo component <EthHashInfo textSize="sm" hash={approval.tokenAddress} shortenHash={4} showCopyBtn /> */}
             </div>
           </FlexRowWrapper>
           <FlexRowWrapper>
-            <EthHashInfo hash={approval.spender} shortenHash={4} showAvatar showCopyBtn />
+            {/* TODO add EthHashInfo<EthHashInfo hash={approval.spender} shortenHash={4} showAvatar showCopyBtn /> */}
           </FlexRowWrapper>
           <FlexRowWrapper>
-            {UNLIMITED_ALLOWANCE.isEqualTo(approval.currentAmountInWEI) ? (
-              <Text size="lg" strong>
-                Unlimited
-              </Text>
-            ) : (
-              <Text size="lg" strong>
-                {approval.currentAmount.toFixed()}
-              </Text>
-            )}
+            <Typography fontWeight={700}>
+              {UNLIMITED_ALLOWANCE.isEqualTo(approval.currentAmountInWEI)
+                ? 'Unlimited'
+                : approval.currentAmount.toFixed()}
+            </Typography>
           </FlexRowWrapper>
         </ColumnGrid>
       </AccordionSummary>

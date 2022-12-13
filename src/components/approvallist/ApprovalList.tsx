@@ -1,4 +1,4 @@
-import { Button } from '@gnosis.pm/safe-react-components';
+import { Button } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useContext, useState } from 'react';
 
@@ -20,10 +20,10 @@ export const ApprovalList = observer(() => {
         <ApprovalEntry key={approval.id} approval={approval} />
       ))}
       <Button
-        variant={uiStore.selectedApprovals.length === 0 ? 'bordered' : 'contained'}
+        variant={uiStore.selectedApprovals.length === 0 ? 'outlined' : 'contained'}
         disabled={uiStore.selectedApprovals.length === 0}
         style={{ marginTop: 16 }}
-        size="lg"
+        size="large"
         onClick={() => setApprovalDialogOpen(true)}
       >
         Edit Approvals

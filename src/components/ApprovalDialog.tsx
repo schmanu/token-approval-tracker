@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { Button, Dialog, DialogContent, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Avatar, Button, Dialog, DialogContent, MenuItem, Select, TextField, Typography } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useCallback, useState } from 'react';
@@ -76,13 +76,15 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                 return (
                   <ColumnGrid>
                     <FlexRowWrapper>
-                      <img
+                      <Avatar
                         src={tokenInfoMap?.get(approval.tokenAddress)?.logoUri}
-                        width={24}
-                        height={24}
+                        sx={{ width: '24px', height: '24px' }}
                         alt={tokenInfoMap?.get(approval.tokenAddress)?.symbol}
                       />
-                      <EthHashInfo showAvatar={false} address={approval.tokenAddress} />
+                      <div>
+                        <Typography>{tokenInfoMap?.get(approval.tokenAddress)?.symbol}</Typography>
+                        <EthHashInfo showAvatar={false} address={approval.tokenAddress} />
+                      </div>
                     </FlexRowWrapper>
                     <FlexRowWrapper>
                       <EthHashInfo avatarSize={32} address={approval.spender} />

@@ -22,6 +22,7 @@ const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-bottom: 16px;
 `;
 
 const tokenStore = new TokenStore();
@@ -32,7 +33,15 @@ const uiStore = new UIStore();
 
 const SafeApp = (): React.ReactElement => {
   return (
-    <Card sx={{ height: '100vh', backgroundColor: ({ palette }) => palette.background.default }}>
+    <Card
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: ({ palette }) => palette.background.default,
+      }}
+    >
       <HeaderWrapper>
         <Row>
           <img src={`${process.env.PUBLIC_URL}/logo.svg`} width={64} height={64} alt="Logo"></img>
@@ -41,7 +50,7 @@ const SafeApp = (): React.ReactElement => {
         <Typography>✅ Keep track of all your token approvals.</Typography>
         <Typography>✍️ Edit / Revoke multiple approvals in a single transaction.</Typography>
       </HeaderWrapper>
-      <Card sx={{ margin: 2, padding: '16px 32px' }} elevation={0}>
+      <Card sx={{ width: '90vw', padding: '16px 32px' }} elevation={0}>
         <StoreContextProvider stores={{ tokenStore, transactionStore, uiStore }} loading={<ApprovalLoader />}>
           <ApprovalList />
         </StoreContextProvider>

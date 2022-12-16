@@ -21,8 +21,9 @@ const StyledDot = muiStyled(Badge)(({ theme }) => ({
   width: '20px',
   height: '20px',
   marginRight: '20px',
-  backgroundColor: theme.palette.background.dark,
-  color: theme.palette.text.secondary,
+  backgroundColor: theme.palette.background.light,
+  color: theme.palette.text.primary,
+  fontWeight: 700,
 }));
 
 const FAQContainer = styled.div`

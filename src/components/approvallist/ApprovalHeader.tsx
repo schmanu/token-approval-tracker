@@ -26,13 +26,10 @@ export const ApprovalHeader = observer(() => {
       </StyledFirstRow>
       <ColumnGrid
         style={{
-          paddingLeft: 22,
-          paddingRight: 44,
           minHeight: 48,
-          width: 'inherit',
         }}
       >
-        <FlexRowWrapper>
+        <FlexRowWrapper style={{ paddingLeft: '16px' }}>
           <Checkbox
             checked={uiStore.allSelected}
             name="checkAll"
@@ -47,7 +44,7 @@ export const ApprovalHeader = observer(() => {
         <FlexRowWrapper>
           <Typography fontWeight={700}>Spender</Typography>
         </FlexRowWrapper>
-        <FlexRowWrapper>
+        <FlexRowWrapper style={{ marginLeft: '-16px' }}>
           <Typography fontWeight={700}>Current Allowance</Typography>
         </FlexRowWrapper>
       </ColumnGrid>

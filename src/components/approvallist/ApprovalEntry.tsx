@@ -1,4 +1,4 @@
-import { Accordion, AccordionSummary, Checkbox, Typography } from '@mui/material';
+import { Accordion, AccordionSummary, Avatar, Checkbox, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
 
@@ -36,10 +36,9 @@ export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
             </div>
           </FlexRowWrapper>
           <FlexRowWrapper>
-            <img
+            <Avatar
               src={tokenMap?.get(approval.tokenAddress)?.logoUri}
-              width={24}
-              height={24}
+              sx={{ width: '24px', height: '24px' }}
               alt={tokenMap?.get(approval.tokenAddress)?.symbol}
             />
             <div style={{ display: 'flex', flexDirection: 'column' }}>

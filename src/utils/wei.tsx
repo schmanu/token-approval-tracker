@@ -4,7 +4,7 @@ const TEN = new BigNumber(10);
 
 export function toWei(amount: string | number | BigNumber, decimals: number): BigNumber {
   let res = TEN.pow(decimals).multipliedBy(amount);
-  if (res.decimalPlaces() > 0) {
+  if ((res.decimalPlaces() ?? 0) > 0) {
     res = res.decimalPlaces(0, BigNumber.ROUND_DOWN);
   }
   return res;

@@ -7,7 +7,6 @@ import githublogo from '../static/github.png';
 const StyledFooterRow = styled.div`
   display: flex;
   flex-direction: row;
-  align-self: flex-start;
   padding: 1rem;
   align-items: center;
   gap: 0.75rem;

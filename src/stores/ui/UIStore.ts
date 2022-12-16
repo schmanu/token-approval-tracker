@@ -1,3 +1,4 @@
+import { SafeBalances } from '@gnosis.pm/safe-apps-sdk';
 import BigNumber from 'bignumber.js';
 import { action, computed, makeObservable, observable } from 'mobx';
 
@@ -87,15 +88,24 @@ export class UIApprovalEntry {
 
 export class UIStore {
   readonly approvals = observable<UIApprovalEntry>([]);
+  balances = observable<SafeBalances>({ fiatTotal: '', items: [] });
+
   hideRevokedApprovals: boolean;
+  hideZeroBalances: boolean;
 
   constructor() {
     this.hideRevokedApprovals = false;
+    this.hideZeroBalances = false;
+
     makeObservable(this, {
       approvals: observable,
+      balances: observable,
       hideRevokedApprovals: observable,
+      hideZeroBalances: observable,
       setApprovals: action,
+      setBalances: action,
       toggleHideRevokedApprovals: action,
+      toggleHideZeroBalances: action,
       allSelected: computed,
       selectedApprovals: computed,
       filteredApprovals: computed,
@@ -106,8 +116,16 @@ export class UIStore {
     this.approvals.replace(newApprovals);
   };
 
+  setBalances = (newBalances: SafeBalances) => {
+    this.balances = newBalances;
+  };
+
   toggleHideRevokedApprovals = () => {
     this.hideRevokedApprovals = !this.hideRevokedApprovals;
+  };
+
+  toggleHideZeroBalances = () => {
+    this.hideZeroBalances = !this.hideZeroBalances;
   };
 
   get allSelected() {
@@ -115,11 +133,18 @@ export class UIStore {
   }
 
   get filteredApprovals() {
+    let result = [...this.approvals];
     if (this.hideRevokedApprovals) {
-      return this.approvals.filter((approval) => !approval.currentAmount.isZero());
-    } else {
-      return this.approvals;
+      result = this.approvals.filter((approval) => !approval.currentAmount.isZero());
     }
+
+    if (this.hideZeroBalances) {
+      result = this.approvals.filter((approval) =>
+        this.balances.items.find((item) => item.tokenInfo.address === approval.tokenAddress && item.balance !== '0'),
+      );
+    }
+
+    return result;
   }
 
   get selectedApprovals() {

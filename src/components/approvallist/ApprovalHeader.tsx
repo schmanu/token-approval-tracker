@@ -44,8 +44,11 @@ export const ApprovalHeader = observer(() => {
         <FlexRowWrapper>
           <Typography fontWeight={700}>Spender</Typography>
         </FlexRowWrapper>
-        <FlexRowWrapper style={{ marginLeft: '-16px' }}>
+        <FlexRowWrapper>
           <Typography fontWeight={700}>Current Allowance</Typography>
+        </FlexRowWrapper>
+        <FlexRowWrapper style={{ marginLeft: '-16px' }}>
+          <Typography fontWeight={700}>Balance</Typography>
         </FlexRowWrapper>
       </ColumnGrid>
     </>

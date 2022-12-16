@@ -7,6 +7,7 @@ import { Footer } from './components/Footer';
 import { ApprovalList } from './components/approvallist/ApprovalList';
 import { FAQSection } from './components/approvallist/FAQSection';
 import { StoreContextProvider } from './stores/StoreContextProvider';
+import { BalanceStore } from './stores/tokens/BalanceStore';
 import { TokenStore } from './stores/tokens/TokenStore';
 import { TransactionStore } from './stores/transactions/TransactionStore';
 import { UIStore } from './stores/ui/UIStore';
@@ -27,6 +28,8 @@ const Row = styled.div`
 
 const tokenStore = new TokenStore();
 
+const balanceStore = new BalanceStore();
+
 const transactionStore = new TransactionStore();
 
 const uiStore = new UIStore();
@@ -39,6 +42,7 @@ const SafeApp = (): React.ReactElement => {
         flexDirection: 'column',
         alignItems: 'center',
         height: '100vh',
+        overflow: 'auto',
         backgroundColor: ({ palette }) => palette.background.default,
       }}
     >
@@ -50,8 +54,11 @@ const SafeApp = (): React.ReactElement => {
         <Typography>✅ Keep track of all your token approvals.</Typography>
         <Typography>✍️ Edit / Revoke multiple approvals in a single transaction.</Typography>
       </HeaderWrapper>
-      <Card sx={{ width: '90vw', padding: '16px 32px' }} elevation={0}>
-        <StoreContextProvider stores={{ tokenStore, transactionStore, uiStore }} loading={<ApprovalLoader />}>
+      <Card sx={{ width: '90vw', padding: '16px 32px', overflow: 'visible' }} elevation={0}>
+        <StoreContextProvider
+          stores={{ tokenStore, transactionStore, uiStore, balanceStore }}
+          loading={<ApprovalLoader />}
+        >
           <ApprovalList />
         </StoreContextProvider>
       </Card>

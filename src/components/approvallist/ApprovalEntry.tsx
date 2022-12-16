@@ -1,10 +1,12 @@
 import { Accordion, AccordionSummary, Avatar, Checkbox, Typography } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useContext } from 'react';
 
 import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { StoreContext } from '../../stores/StoreContextProvider';
 import { UIApprovalEntry } from '../../stores/ui/UIStore';
+import { fromWei } from '../../utils/wei';
 import { EthHashInfo } from '../EthHashInfo';
 
 import { ApprovalTransactionHistory } from './ApprovalTransactionHistory';
@@ -15,8 +17,11 @@ interface ApprovalEntryProps {
 }
 
 export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
-  const { tokenStore } = useContext(StoreContext);
+  const { tokenStore, balanceStore } = useContext(StoreContext);
   const tokenMap = tokenStore.tokenInfoMap;
+  const balances = balanceStore.balances;
+
+  const tokenBalance = balances.items.find((item) => item.tokenInfo.address === approval.tokenAddress);
 
   return (
     <Accordion key={approval.id}>
@@ -54,6 +59,13 @@ export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
               {UNLIMITED_ALLOWANCE.isEqualTo(approval.currentAmountInWEI)
                 ? 'Unlimited'
                 : approval.currentAmount.toFixed()}
+            </Typography>
+          </FlexRowWrapper>
+          <FlexRowWrapper>
+            <Typography fontWeight={700}>
+              {tokenBalance
+                ? fromWei(new BigNumber(tokenBalance.balance), tokenBalance.tokenInfo.decimals).toFixed(3)
+                : '0'}
             </Typography>
           </FlexRowWrapper>
         </ColumnGrid>

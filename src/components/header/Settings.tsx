@@ -18,25 +18,35 @@ export const Settings: () => ReactElement = observer(() => {
       <SettingsButton onClick={() => setIsOpen(!isOpen)} />
       {isOpen && (
         <StyledSettingsOverlay>
-          <StyledSettingsRow>
-            <FormGroup>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="hideRevokedApprovals"
-                      checked={uiStore.hideRevokedApprovals}
-                      onChange={uiStore.toggleHideRevokedApprovals}
-                    />
-                  }
-                  label="Hide revoked"
-                />
-              </FormGroup>
-            </FormGroup>
-            <Tooltip title="Approvals with allowance 0 will be hidden">
-              <HelpOutlineIcon />
-            </Tooltip>
-          </StyledSettingsRow>
+          <FormGroup>
+            <StyledSettingsRow>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name="hideRevokedApprovals"
+                    checked={uiStore.hideRevokedApprovals}
+                    onChange={uiStore.toggleHideRevokedApprovals}
+                  />
+                }
+                label="Hide revoked"
+              />
+              <Tooltip title="Approvals with allowance 0 will be hidden">
+                <HelpOutlineIcon />
+              </Tooltip>
+            </StyledSettingsRow>
+            <StyledSettingsRow>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name="hideZeroBalances"
+                    checked={uiStore.hideZeroBalances}
+                    onChange={uiStore.toggleHideZeroBalances}
+                  />
+                }
+                label="Hide zero balances"
+              />
+            </StyledSettingsRow>
+          </FormGroup>
         </StyledSettingsOverlay>
       )}
     </Wrapper>

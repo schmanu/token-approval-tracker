@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { Avatar, Button, Dialog, DialogContent, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useCallback, useState } from 'react';

@@ -1,4 +1,4 @@
-import { SafeBalances } from '@gnosis.pm/safe-apps-sdk';
+import { SafeBalances } from '@safe-global/safe-apps-sdk';
 import BigNumber from 'bignumber.js';
 import { action, computed, makeObservable, observable } from 'mobx';
 
@@ -16,7 +16,6 @@ export class UIApprovalEntry {
   inputMode: 'custom' | 'unlimited' | 'revoke';
   selected: boolean;
   decimals: number;
-  transactions: Transaction[];
 
   constructor(approval: AccumulatedApproval, decimals: number) {
     this.tokenAddress = approval.tokenAddress;
@@ -25,7 +24,6 @@ export class UIApprovalEntry {
     this.editedAmount = '0';
     this.selected = false;
     this.decimals = decimals;
-    this.transactions = approval.transactions;
     this.inputMode = 'revoke';
 
     makeObservable(this, {
@@ -94,7 +92,7 @@ export class UIStore {
   hideZeroBalances: boolean;
 
   constructor() {
-    this.hideRevokedApprovals = false;
+    this.hideRevokedApprovals = true;
     this.hideZeroBalances = false;
 
     makeObservable(this, {
@@ -135,11 +133,11 @@ export class UIStore {
   get filteredApprovals() {
     let result = [...this.approvals];
     if (this.hideRevokedApprovals) {
-      result = this.approvals.filter((approval) => !approval.currentAmount.isZero());
+      result = result.filter((approval) => !approval.currentAmount.isZero());
     }
 
     if (this.hideZeroBalances) {
-      result = this.approvals.filter((approval) =>
+      result = result.filter((approval) =>
         this.balances.items.find((item) => item.tokenInfo.address === approval.tokenAddress && item.balance !== '0'),
       );
     }

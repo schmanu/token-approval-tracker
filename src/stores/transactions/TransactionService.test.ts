@@ -50,12 +50,6 @@ describe('TransactionStore', () => {
     expect(approvalsTxs[0].allowance).toBe(toWei(42, 18).toFixed());
     expect(approvalsTxs[0].spender).toBe(spenderAddress);
     expect(approvalsTxs[0].tokenAddress).toBe(tokenAddress);
-    expect(approvalsTxs[0].transactions).toHaveLength(1);
-    expect(approvalsTxs[0].transactions[0].txHash).toBe(ethers.utils.hexZeroPad('0x1', 32));
-    expect(approvalsTxs[0].transactions[0].executionDate).toBe(1000);
-    expect(approvalsTxs[0].transactions[0].value).toBe(
-      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())), 32),
-    );
   });
 
   test('skips faulty log entries and continues parsing', async () => {
@@ -86,12 +80,6 @@ describe('TransactionStore', () => {
     expect(approvalsTxs[0].allowance).toBe(toWei(42, 18).toFixed());
     expect(approvalsTxs[0].spender).toBe(spenderAddress);
     expect(approvalsTxs[0].tokenAddress).toBe(tokenAddress);
-    expect(approvalsTxs[0].transactions).toHaveLength(1);
-    expect(approvalsTxs[0].transactions[0].txHash).toBe(ethers.utils.hexZeroPad('0x2', 32));
-    expect(approvalsTxs[0].transactions[0].executionDate).toBe(2000);
-    expect(approvalsTxs[0].transactions[0].value).toBe(
-      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())), 32),
-    );
   });
 
   test('parses multiple approval log entries', async () => {
@@ -123,22 +111,10 @@ describe('TransactionStore', () => {
     expect(approvalsTxs[0].allowance).toBe(toWei(0, 18).toFixed());
     expect(approvalsTxs[0].spender).toBe(spenderAddress2);
     expect(approvalsTxs[0].tokenAddress).toBe(tokenAddress2);
-    expect(approvalsTxs[0].transactions).toHaveLength(1);
-    expect(approvalsTxs[0].transactions[0].txHash).toBe(ethers.utils.hexZeroPad(ethers.utils.hexlify(321), 32));
-    expect(approvalsTxs[0].transactions[0].executionDate).toBe(321000);
-    expect(approvalsTxs[0].transactions[0].value).toBe(
-      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(42, 18).toFixed())), 32),
-    );
 
     expect(approvalsTxs[1].allowance).toBe(toWei(0, 18).toFixed());
     expect(approvalsTxs[1].spender).toBe(spenderAddress);
     expect(approvalsTxs[1].tokenAddress).toBe(tokenAddress);
-    expect(approvalsTxs[1].transactions).toHaveLength(1);
-    expect(approvalsTxs[1].transactions[0].txHash).toBe(ethers.utils.hexZeroPad(ethers.utils.hexlify(123), 32));
-    expect(approvalsTxs[1].transactions[0].executionDate).toBe(123000);
-    expect(approvalsTxs[1].transactions[0].value).toBe(
-      ethers.utils.hexZeroPad(ethers.utils.hexlify(ethers.BigNumber.from(toWei(69, 18).toFixed())), 32),
-    );
   });
 
   test('can parse the log entries from a bug report', async () => {

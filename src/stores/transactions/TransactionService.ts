@@ -1,4 +1,4 @@
-import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import { ethers } from 'ethers';
 import { hexZeroPad } from 'ethers/lib/utils';
 
@@ -11,7 +11,7 @@ type TransactionLog = ethers.providers.Log & {
   tokenAddress: string;
   txHash: string;
   blockHash: string;
-  timestamp: number;
+  blockNumber: number;
 };
 
 export const fetchApprovalsOnChain: (
@@ -19,6 +19,7 @@ export const fetchApprovalsOnChain: (
   safeAppProvider: SafeAppProvider,
 ) => Promise<TransactionLog[]> = async (safeAddress, safeAppProvider) => {
   const web3Provider = new ethers.providers.Web3Provider(safeAppProvider);
+  console.log('Fetching approvals...');
   const approvalLogs = await web3Provider
     .getLogs({
       fromBlock: 0,
@@ -26,22 +27,22 @@ export const fetchApprovalsOnChain: (
       topics: [ethers.utils.id('Approval(address,address,uint256)'), hexZeroPad(safeAddress, 32)],
     })
     // We filter out mismatching Approval events like ERC721 approvals
-    .then((logs) => logs.filter((log) => log.topics.length === 3))
+    .then((logs) => {
+      console.log('Filtering approvals');
+      return logs.filter((log) => log.topics.length === 3);
+    })
     .then((logs) =>
       logs.map((log) => ({
         ...log,
         tokenAddress: log.address,
         txHash: log.transactionHash,
         blockHash: log.blockHash,
+        blockNumber: log.blockNumber,
       })),
     );
 
-  return await Promise.all(
-    approvalLogs.map(async (log) => ({
-      ...log,
-      timestamp: (await web3Provider.getBlock(log.blockHash)).timestamp,
-    })),
-  );
+  console.log('Fetched approvalLogs');
+  return approvalLogs;
 };
 
 /**
@@ -53,7 +54,7 @@ export const fetchApprovalsOnChain: (
  */
 export const fetchApprovalTransactions = async (safeAddress: string, safeAppProvider: SafeAppProvider) => {
   const transactionsByToken = await fetchApprovalsOnChain(safeAddress, safeAppProvider)
-    .then((transactions) => transactions.sort((a, b) => b.timestamp - a.timestamp))
+    .then((transactions) => transactions.sort((a, b) => b.blockNumber - a.blockNumber))
     .then((transactions) => reduceToMap(transactions, (obj) => obj.tokenAddress))
     .catch((reason) => {
       console.error(`Error while fetching approval transactions: ${reason}`);
@@ -75,11 +76,6 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
             spender: spenderEntry[0],
             tokenAddress: tokenEntry[0],
             allowance: allowance.toFixed(),
-            transactions: spenderEntry[1].map((tx) => ({
-              executionDate: tx.timestamp * 1000, // millis
-              txHash: tx.txHash,
-              value: tx.data,
-            })),
           });
         }
       }

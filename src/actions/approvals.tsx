@@ -1,4 +1,4 @@
-import { BaseTransaction } from '@gnosis.pm/safe-apps-sdk';
+import { BaseTransaction } from '@safe-global/safe-apps-sdk';
 
 import { ERC20__factory } from '../contracts';
 import { UIApprovalEntry } from '../stores/ui/UIStore';

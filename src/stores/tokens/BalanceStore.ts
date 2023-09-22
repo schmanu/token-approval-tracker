@@ -1,4 +1,4 @@
-import SDK, { SafeBalances } from '@gnosis.pm/safe-apps-sdk';
+import SDK, { SafeBalances } from '@safe-global/safe-apps-sdk';
 import { action, makeObservable, observable } from 'mobx';
 
 export class BalanceStore {

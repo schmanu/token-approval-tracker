@@ -1,19 +1,8 @@
-import styled from '@emotion/styled';
-import { CircularProgress, Typography } from '@mui/material';
-
-const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-`;
+import { Box, CircularProgress, Typography } from '@mui/material';
 
 export const ApprovalLoader = () => (
-  <Wrapper>
+  <Box display="flex" flexDirection="row" gap={2} alignItems="center" justifyContent="center">
+    <CircularProgress />
     <Typography variant="h1">Loading Approvals</Typography>
-    <CircularProgress size="lg" />
-  </Wrapper>
+  </Box>
 );

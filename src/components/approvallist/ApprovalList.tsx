@@ -19,20 +19,6 @@ export const ApprovalList = observer(() => {
       {approvals?.map((approval) => (
         <ApprovalEntry key={approval.id} approval={approval} />
       ))}
-      <Button
-        variant={uiStore.selectedApprovals.length === 0 ? 'outlined' : 'contained'}
-        disabled={uiStore.selectedApprovals.length === 0}
-        style={{ marginTop: 16 }}
-        size="large"
-        onClick={() => setApprovalDialogOpen(true)}
-      >
-        Edit Approvals
-      </Button>
-      {approvalDialogOpen && (
-        <div style={{ position: 'absolute', top: '0px', height: '100%', width: '100%' }}>
-          <ApprovalDialog onCancel={() => setApprovalDialogOpen(false)} />
-        </div>
-      )}
     </>
   );
 });

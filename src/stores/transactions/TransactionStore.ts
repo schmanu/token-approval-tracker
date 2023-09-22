@@ -1,10 +1,10 @@
-import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import { action, makeObservable, observable } from 'mobx';
 
 import { fetchApprovalTransactions } from './TransactionService';
 
 export interface Transaction {
-  executionDate: number | null;
+  blockNumber: number;
   value?: string;
   txHash: string | null;
 }
@@ -12,7 +12,6 @@ export interface AccumulatedApproval {
   tokenAddress: string;
   spender: string;
   allowance: string;
-  transactions: Transaction[];
 }
 
 export class TransactionStore {

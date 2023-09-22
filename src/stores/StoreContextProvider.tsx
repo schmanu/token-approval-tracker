@@ -1,5 +1,5 @@
-import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
+import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk';
 import { observable, reaction } from 'mobx';
 import { createContext, ReactElement, useContext, useEffect } from 'react';
 
@@ -37,7 +37,7 @@ export const StoreContext = createContext<{
     allSelected: false,
     selectAll: () => {},
     selectedApprovals: [],
-    hideRevokedApprovals: false,
+    hideRevokedApprovals: true,
     hideZeroBalances: false,
     toggleHideRevokedApprovals: () => {},
     toggleHideZeroBalances: () => {},

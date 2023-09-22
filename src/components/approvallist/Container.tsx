@@ -4,6 +4,7 @@ export const ColumnGrid = styled.div`
   display: grid;
   grid-template-columns: 0.5fr 3fr 3fr 3fr 3fr;
   width: 100%;
+  padding: 8px 0px;
 `;
 
 export const AccordionDetailsContainer = styled.div`

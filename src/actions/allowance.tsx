@@ -1,4 +1,4 @@
-import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import { BigNumber } from 'bignumber.js';
 import { ethers } from 'ethers';
 

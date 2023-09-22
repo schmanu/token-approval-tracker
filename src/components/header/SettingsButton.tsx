@@ -7,6 +7,7 @@ const StyledButton = styled(Button)`
   display: flex;
   flex-direction: row;
   cursor: pointer;
+  gap: 8px;
 `;
 
 const StyledIcon = styled(SettingsIcon)`
@@ -26,7 +27,7 @@ interface SettingsButtonProps {
 export const SettingsButton: (props: SettingsButtonProps) => ReactElement = (props) => {
   const { onClick } = props;
   return (
-    <StyledButton onClick={onClick}>
+    <StyledButton variant="outlined" size="large" onClick={onClick}>
       <Typography fontWeight={700}>Settings</Typography>
       <StyledIcon />
     </StyledButton>

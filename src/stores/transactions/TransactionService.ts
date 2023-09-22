@@ -10,8 +10,6 @@ import { AccumulatedApproval } from './TransactionStore';
 type TransactionLog = ethers.providers.Log & {
   tokenAddress: string;
   txHash: string;
-  blockHash: string;
-  blockNumber: number;
 };
 
 export const fetchApprovalsOnChain: (
@@ -36,8 +34,6 @@ export const fetchApprovalsOnChain: (
         ...log,
         tokenAddress: log.address,
         txHash: log.transactionHash,
-        blockHash: log.blockHash,
-        blockNumber: log.blockNumber,
       })),
     );
 
@@ -54,7 +50,15 @@ export const fetchApprovalsOnChain: (
  */
 export const fetchApprovalTransactions = async (safeAddress: string, safeAppProvider: SafeAppProvider) => {
   const transactionsByToken = await fetchApprovalsOnChain(safeAddress, safeAppProvider)
-    .then((transactions) => transactions.sort((a, b) => b.blockNumber - a.blockNumber))
+    .then((transactions) =>
+      transactions.sort((a, b) => {
+        const blockDiff = b.blockNumber - a.blockNumber;
+        if (blockDiff !== 0) {
+          return blockDiff;
+        }
+        return b.logIndex - a.logIndex;
+      }),
+    )
     .then((transactions) => reduceToMap(transactions, (obj) => obj.tokenAddress))
     .catch((reason) => {
       console.error(`Error while fetching approval transactions: ${reason}`);

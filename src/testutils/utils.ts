@@ -57,7 +57,8 @@ interface MockApprovalData {
   ownerAddress: string;
   spenderAddress: string;
   allowance: BigNumber;
-  timeStamp: number;
+  logIndex: number;
+  blockNumber: number;
 }
 
 type LogReturnType = 'generated' | 'bugReportLog';
@@ -71,13 +72,13 @@ const createMockApprovalLogEntries = (dataArray: MockApprovalData[] | undefined,
         ethers.utils.hexlify(ethers.BigNumber.from(toWei(data.allowance, decimals ?? 18).toFixed())),
         32,
       ),
-      blockHash: ethers.utils.hexZeroPad(ethers.utils.hexlify(data.timeStamp), 32),
       topics: [
         '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925', // Approval ID
         data.ownerAddress,
         data.spenderAddress,
       ],
-      transactionHash: ethers.utils.hexZeroPad(ethers.utils.hexlify(data.timeStamp), 32),
+      logIndex: ethers.utils.hexlify(data.logIndex),
+      blockNumber: ethers.utils.hexlify(data.blockNumber),
     })) ?? [];
   return result;
 };
@@ -128,11 +129,6 @@ export const createMockSafeAppProvider: (returnData: {
             return Promise.resolve(errorLogEntry);
           }
           return Promise.resolve(createMockApprovalLogEntries(returnData.approvalLogs));
-        case 'eth_getBlockByHash':
-          return {
-            ...mockBlock,
-            timestamp: params ? ethers.utils.hexlify(new BigNumber(params[0]).mod(1_000_000).toNumber()) : '0x0',
-          };
       }
       return Promise.resolve(undefined);
     },

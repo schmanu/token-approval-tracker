@@ -39,7 +39,8 @@ describe('TransactionStore', () => {
           allowance: new BigNumber(69),
           ownerAddress: ethers.utils.hexZeroPad(safeAddress, 32),
           spenderAddress: ethers.utils.hexZeroPad(spenderAddress, 32),
-          timeStamp: 1,
+          blockNumber: 0,
+          logIndex: 0,
         },
       ],
     });
@@ -62,14 +63,16 @@ describe('TransactionStore', () => {
           allowance: new BigNumber(69),
           ownerAddress: ethers.utils.hexZeroPad(safeAddress, 32),
           spenderAddress: ethers.utils.hexZeroPad(ERROR_CAUSING_SPENDER, 32),
-          timeStamp: 1,
+          blockNumber: 0,
+          logIndex: 0,
         },
         {
           tokenAddress,
           allowance: new BigNumber(69),
           ownerAddress: ethers.utils.hexZeroPad(safeAddress, 32),
           spenderAddress: ethers.utils.hexZeroPad(spenderAddress, 32),
-          timeStamp: 2,
+          blockNumber: 1,
+          logIndex: 0,
         },
       ],
     });
@@ -84,37 +87,35 @@ describe('TransactionStore', () => {
 
   test('parses multiple approval log entries', async () => {
     const safeProvider = createMockSafeAppProvider({
-      allowance: new BigNumber(0),
+      allowance: new BigNumber(42),
       decimals: 18,
       approvalLogs: [
         {
-          tokenAddress,
+          tokenAddress: tokenAddress2,
           allowance: new BigNumber(69),
           ownerAddress: ethers.utils.hexZeroPad(safeAddress, 32),
-          spenderAddress: ethers.utils.hexZeroPad(spenderAddress, 32),
-          timeStamp: 123,
+          spenderAddress: ethers.utils.hexZeroPad(spenderAddress2, 32),
+          blockNumber: 1,
+          logIndex: 0,
         },
         {
           tokenAddress: tokenAddress2,
           allowance: new BigNumber(42),
           ownerAddress: ethers.utils.hexZeroPad(safeAddress, 32),
           spenderAddress: ethers.utils.hexZeroPad(spenderAddress2, 32),
-          timeStamp: 321,
+          blockNumber: 1,
+          logIndex: 1,
         },
       ],
     });
 
     const approvalsTxs = await fetchApprovalTransactions(safeAddress, safeProvider);
 
-    expect(approvalsTxs).toHaveLength(2);
-    // First approval is for tokenAddress2 because of higher timestamp
-    expect(approvalsTxs[0].allowance).toBe(toWei(0, 18).toFixed());
+    expect(approvalsTxs).toHaveLength(1);
+    // First approval is for tokenAddress2 because of highest blockNumber and logIndex
+    expect(approvalsTxs[0].allowance).toBe(toWei(42, 18).toFixed());
     expect(approvalsTxs[0].spender).toBe(spenderAddress2);
     expect(approvalsTxs[0].tokenAddress).toBe(tokenAddress2);
-
-    expect(approvalsTxs[1].allowance).toBe(toWei(0, 18).toFixed());
-    expect(approvalsTxs[1].spender).toBe(spenderAddress);
-    expect(approvalsTxs[1].tokenAddress).toBe(tokenAddress);
   });
 
   test('can parse the log entries from a bug report', async () => {

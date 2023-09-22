@@ -4,7 +4,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 
 import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { fromWei, toWei } from '../../utils/wei';
-import { AccumulatedApproval, Transaction } from '../transactions/TransactionStore';
+import { AccumulatedApproval } from '../transactions/TransactionStore';
 
 export class UIApprovalEntry {
   tokenAddress: string;

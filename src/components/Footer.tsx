@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import { Link, SvgIcon, Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 import { ReactElement } from 'react';
 
 const StyledFooterRow = styled.div`

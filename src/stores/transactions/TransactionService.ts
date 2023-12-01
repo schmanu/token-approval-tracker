@@ -17,7 +17,6 @@ export const fetchApprovalsOnChain: (
   safeAppProvider: SafeAppProvider,
 ) => Promise<TransactionLog[]> = async (safeAddress, safeAppProvider) => {
   const web3Provider = new ethers.providers.Web3Provider(safeAppProvider);
-  console.log('Fetching approvals...');
   const approvalLogs = await web3Provider
     .getLogs({
       fromBlock: 0,
@@ -26,7 +25,6 @@ export const fetchApprovalsOnChain: (
     })
     // We filter out mismatching Approval events like ERC721 approvals
     .then((logs) => {
-      console.log('Filtering approvals');
       return logs.filter((log) => log.topics.length === 3);
     })
     .then((logs) =>
@@ -37,7 +35,6 @@ export const fetchApprovalsOnChain: (
       })),
     );
 
-  console.log('Fetched approvalLogs');
   return approvalLogs;
 };
 

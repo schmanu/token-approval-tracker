@@ -1,9 +1,10 @@
+import { SafeBalances } from '@safe-global/safe-apps-sdk';
 import BigNumber from 'bignumber.js';
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { UNLIMITED_ALLOWANCE } from '../../constants';
 import { fromWei, toWei } from '../../utils/wei';
-import { AccumulatedApproval, Transaction } from '../transactions/TransactionStore';
+import { AccumulatedApproval } from '../transactions/TransactionStore';
 
 export class UIApprovalEntry {
   tokenAddress: string;
@@ -15,7 +16,6 @@ export class UIApprovalEntry {
   inputMode: 'custom' | 'unlimited' | 'revoke';
   selected: boolean;
   decimals: number;
-  transactions: Transaction[];
 
   constructor(approval: AccumulatedApproval, decimals: number) {
     this.tokenAddress = approval.tokenAddress;
@@ -24,7 +24,6 @@ export class UIApprovalEntry {
     this.editedAmount = '0';
     this.selected = false;
     this.decimals = decimals;
-    this.transactions = approval.transactions;
     this.inputMode = 'revoke';
 
     makeObservable(this, {
@@ -87,15 +86,24 @@ export class UIApprovalEntry {
 
 export class UIStore {
   readonly approvals = observable<UIApprovalEntry>([]);
+  balances = observable<SafeBalances>({ fiatTotal: '', items: [] });
+
   hideRevokedApprovals: boolean;
+  hideZeroBalances: boolean;
 
   constructor() {
-    this.hideRevokedApprovals = false;
+    this.hideRevokedApprovals = true;
+    this.hideZeroBalances = false;
+
     makeObservable(this, {
       approvals: observable,
+      balances: observable,
       hideRevokedApprovals: observable,
+      hideZeroBalances: observable,
       setApprovals: action,
+      setBalances: action,
       toggleHideRevokedApprovals: action,
+      toggleHideZeroBalances: action,
       allSelected: computed,
       selectedApprovals: computed,
       filteredApprovals: computed,
@@ -106,8 +114,16 @@ export class UIStore {
     this.approvals.replace(newApprovals);
   };
 
+  setBalances = (newBalances: SafeBalances) => {
+    this.balances = newBalances;
+  };
+
   toggleHideRevokedApprovals = () => {
     this.hideRevokedApprovals = !this.hideRevokedApprovals;
+  };
+
+  toggleHideZeroBalances = () => {
+    this.hideZeroBalances = !this.hideZeroBalances;
   };
 
   get allSelected() {
@@ -115,11 +131,18 @@ export class UIStore {
   }
 
   get filteredApprovals() {
+    let result = [...this.approvals];
     if (this.hideRevokedApprovals) {
-      return this.approvals.filter((approval) => !approval.currentAmount.isZero());
-    } else {
-      return this.approvals;
+      result = result.filter((approval) => !approval.currentAmount.isZero());
     }
+
+    if (this.hideZeroBalances) {
+      result = result.filter((approval) =>
+        this.balances.items.find((item) => item.tokenInfo.address === approval.tokenAddress && item.balance !== '0'),
+      );
+    }
+
+    return result;
   }
 
   get selectedApprovals() {

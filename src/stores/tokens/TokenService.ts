@@ -1,4 +1,4 @@
-import SafeServiceClient from '@gnosis.pm/safe-service-client';
+import SafeServiceClient from '@safe-global/safe-service-client';
 
 export const fetchTokenInfo = async (tokenAddress: string, safeServiceClient: SafeServiceClient) => {
   if (!safeServiceClient) {

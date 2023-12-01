@@ -1,4 +1,4 @@
-import SafeServiceClient from '@gnosis.pm/safe-service-client';
+import SafeServiceClient from '@safe-global/safe-service-client';
 import { action, makeObservable, observable } from 'mobx';
 
 import { reduceToSet } from '../../utils/arrayReducers';

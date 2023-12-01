@@ -1,4 +1,4 @@
-import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
 import { ethers } from 'ethers';
 import { hexZeroPad } from 'ethers/lib/utils';
 
@@ -10,8 +10,6 @@ import { AccumulatedApproval } from './TransactionStore';
 type TransactionLog = ethers.providers.Log & {
   tokenAddress: string;
   txHash: string;
-  blockHash: string;
-  timestamp: number;
 };
 
 export const fetchApprovalsOnChain: (
@@ -26,22 +24,18 @@ export const fetchApprovalsOnChain: (
       topics: [ethers.utils.id('Approval(address,address,uint256)'), hexZeroPad(safeAddress, 32)],
     })
     // We filter out mismatching Approval events like ERC721 approvals
-    .then((logs) => logs.filter((log) => log.topics.length === 3))
+    .then((logs) => {
+      return logs.filter((log) => log.topics.length === 3);
+    })
     .then((logs) =>
       logs.map((log) => ({
         ...log,
         tokenAddress: log.address,
         txHash: log.transactionHash,
-        blockHash: log.blockHash,
       })),
     );
 
-  return await Promise.all(
-    approvalLogs.map(async (log) => ({
-      ...log,
-      timestamp: (await web3Provider.getBlock(log.blockHash)).timestamp,
-    })),
-  );
+  return approvalLogs;
 };
 
 /**
@@ -53,7 +47,15 @@ export const fetchApprovalsOnChain: (
  */
 export const fetchApprovalTransactions = async (safeAddress: string, safeAppProvider: SafeAppProvider) => {
   const transactionsByToken = await fetchApprovalsOnChain(safeAddress, safeAppProvider)
-    .then((transactions) => transactions.sort((a, b) => b.timestamp - a.timestamp))
+    .then((transactions) =>
+      transactions.sort((a, b) => {
+        const blockDiff = b.blockNumber - a.blockNumber;
+        if (blockDiff !== 0) {
+          return blockDiff;
+        }
+        return b.logIndex - a.logIndex;
+      }),
+    )
     .then((transactions) => reduceToMap(transactions, (obj) => obj.tokenAddress))
     .catch((reason) => {
       console.error(`Error while fetching approval transactions: ${reason}`);
@@ -75,11 +77,6 @@ export const fetchApprovalTransactions = async (safeAddress: string, safeAppProv
             spender: spenderEntry[0],
             tokenAddress: tokenEntry[0],
             allowance: allowance.toFixed(),
-            transactions: spenderEntry[1].map((tx) => ({
-              executionDate: tx.timestamp * 1000, // millis
-              txHash: tx.txHash,
-              value: tx.data,
-            })),
           });
         }
       }

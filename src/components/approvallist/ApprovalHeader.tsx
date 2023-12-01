@@ -1,9 +1,10 @@
-import { Title, Checkbox, Text } from '@gnosis.pm/safe-react-components';
+import styled from '@emotion/styled';
+import { Box, Button, Checkbox, Divider, Typography, useTheme } from '@mui/material';
 import { observer } from 'mobx-react';
-import { useContext } from 'react';
-import styled from 'styled-components';
+import { useContext, useState } from 'react';
 
 import { StoreContext } from '../../stores/StoreContextProvider';
+import { ApprovalDialog } from '../ApprovalDialog';
 import { Settings } from '../header/Settings';
 
 import { ColumnGrid, FlexRowWrapper } from './Container';
@@ -13,30 +14,49 @@ const StyledFirstRow = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0px 16px;
 `;
 
 export const ApprovalHeader = observer(() => {
   const { uiStore } = useContext(StoreContext);
+  const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
+  const theme = useTheme();
+  const hasSelectedApprobals = uiStore.selectedApprovals.length > 0;
 
   return (
     <>
+      {approvalDialogOpen && (
+        <div style={{ position: 'absolute', top: '0px', height: '100%', width: '100%' }}>
+          <ApprovalDialog onCancel={() => setApprovalDialogOpen(false)} />
+        </div>
+      )}
       <StyledFirstRow>
-        <Title size="md">Approvals</Title>
-        <Settings />
+        <Typography variant="h4" fontWeight={700}>
+          Approvals
+        </Typography>
+        <Box display="flex" flexDirection="row" gap={2}>
+          <Settings />
+          <Button
+            variant={hasSelectedApprobals ? 'contained' : 'outlined'}
+            disabled={!hasSelectedApprobals}
+            size="large"
+            onClick={() => setApprovalDialogOpen(true)}
+          >
+            Edit Approvals
+          </Button>
+        </Box>
       </StyledFirstRow>
+      <Divider />
       <ColumnGrid
         style={{
-          paddingLeft: 22,
-          paddingRight: 44,
           minHeight: 48,
-          borderBottom: '2px solid #E8E7E6',
-          width: 'inherit',
+          borderBottom: `1px solid ${theme.palette.border.main}`,
         }}
       >
         <FlexRowWrapper>
           <Checkbox
             checked={uiStore.allSelected}
-            label=""
             name="checkAll"
             onChange={(event, checked) => {
               uiStore.selectAll(checked);
@@ -44,19 +64,16 @@ export const ApprovalHeader = observer(() => {
           />
         </FlexRowWrapper>
         <FlexRowWrapper>
-          <Text size="xl" strong>
-            Token
-          </Text>
+          <Typography fontWeight={700}>Token</Typography>
         </FlexRowWrapper>
         <FlexRowWrapper>
-          <Text size="xl" strong>
-            Spender
-          </Text>
+          <Typography fontWeight={700}>Spender</Typography>
         </FlexRowWrapper>
         <FlexRowWrapper>
-          <Text size="xl" strong>
-            Current Allowance
-          </Text>
+          <Typography fontWeight={700}>Current Allowance</Typography>
+        </FlexRowWrapper>
+        <FlexRowWrapper style={{ marginLeft: '-16px' }}>
+          <Typography fontWeight={700}>Balance</Typography>
         </FlexRowWrapper>
       </ColumnGrid>
     </>

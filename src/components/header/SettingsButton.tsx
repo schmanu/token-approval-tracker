@@ -1,21 +1,16 @@
-import { Icon, Text } from '@gnosis.pm/safe-react-components';
+import styled from '@emotion/styled/macro';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Button, Typography } from '@mui/material';
 import { ReactElement } from 'react';
-import styled from 'styled-components';
 
-const StyledButton = styled.button`
+const StyledButton = styled(Button)`
   display: flex;
   flex-direction: row;
-  background: none;
-  border: none;
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-  &:hover {
-    background-color: rgb(246, 247, 248);
-  }
+  gap: 8px;
 `;
 
-const StyledIcon = styled(Icon)`
+const StyledIcon = styled(SettingsIcon)`
   transition: 0.3s ease;
   & .icon-color {
     fill: #001428;
@@ -32,11 +27,9 @@ interface SettingsButtonProps {
 export const SettingsButton: (props: SettingsButtonProps) => ReactElement = (props) => {
   const { onClick } = props;
   return (
-    <StyledButton onClick={onClick}>
-      <Text size="lg" strong>
-        Settings
-      </Text>
-      <StyledIcon size="md" type="settings" />
+    <StyledButton variant="outlined" size="large" onClick={onClick}>
+      <Typography fontWeight={700}>Settings</Typography>
+      <StyledIcon />
     </StyledButton>
   );
 };

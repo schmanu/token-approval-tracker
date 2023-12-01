@@ -1,7 +1,7 @@
-import { SafeAppProvider } from '@gnosis.pm/safe-apps-provider';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import EthersAdapter from '@gnosis.pm/safe-ethers-lib';
-import SafeServiceClient from '@gnosis.pm/safe-service-client';
+import { SafeAppProvider } from '@safe-global/safe-apps-provider';
+import { useSafeAppsSDK } from '@safe-global/safe-apps-react-sdk';
+import EthersAdapter from '@safe-global/safe-ethers-lib';
+import SafeServiceClient from '@safe-global/safe-service-client';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
@@ -17,7 +17,7 @@ export const useSafeServiceClient = () => {
     const signer = ethersProvider.getSigner(0);
     const ethersAdapter = new EthersAdapter({
       ethers,
-      signer,
+      signerOrProvider: signer,
     });
 
     const txServiceUrl = networkInfo.get(safe.chainId)?.baseAPI;

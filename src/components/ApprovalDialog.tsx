@@ -97,7 +97,9 @@ export const ApprovalDialog = observer((props: ApprovalDialogProps) => {
                         }}
                       >
                         {changeApprovalItems.map((item) => (
-                          <MenuItem value={item.id}>{item.label}</MenuItem>
+                          <MenuItem key={item.id} value={item.id}>
+                            {item.label}
+                          </MenuItem>
                         ))}
                       </Select>
                       <TextField

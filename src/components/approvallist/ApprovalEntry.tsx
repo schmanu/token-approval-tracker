@@ -24,6 +24,8 @@ export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
 
   const tokenBalance = balances.items.find((item) => item.tokenInfo.address === approval.tokenAddress);
 
+  const tokenInfo = tokenMap.get(approval.tokenAddress);
+
   return (
     <ColumnGrid style={{ borderBottom: `1px solid ${theme.palette.border.main}` }}>
       <FlexRowWrapper>
@@ -40,13 +42,9 @@ export const ApprovalEntry = observer(({ approval }: ApprovalEntryProps) => {
         </div>
       </FlexRowWrapper>
       <FlexRowWrapper>
-        <Avatar
-          src={tokenMap?.get(approval.tokenAddress)?.logoUri}
-          sx={{ width: '24px', height: '24px' }}
-          alt={tokenMap?.get(approval.tokenAddress)?.symbol}
-        />
+        <Avatar src={tokenInfo?.logoUri} sx={{ width: '24px', height: '24px' }} alt={tokenInfo?.symbol} />
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography fontWeight={700}>{tokenMap?.get(approval.tokenAddress)?.symbol}</Typography>
+          <Typography fontWeight={700}>{tokenInfo?.symbol}</Typography>
           <EthHashInfo address={approval.tokenAddress} showAvatar={false} />
         </div>
       </FlexRowWrapper>

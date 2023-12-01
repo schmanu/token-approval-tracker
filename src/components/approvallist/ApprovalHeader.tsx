@@ -22,6 +22,7 @@ export const ApprovalHeader = observer(() => {
   const { uiStore } = useContext(StoreContext);
   const [approvalDialogOpen, setApprovalDialogOpen] = useState(false);
   const theme = useTheme();
+  const hasSelectedApprobals = uiStore.selectedApprovals.length > 0;
 
   return (
     <>
@@ -37,8 +38,8 @@ export const ApprovalHeader = observer(() => {
         <Box display="flex" flexDirection="row" gap={2}>
           <Settings />
           <Button
-            variant={uiStore.selectedApprovals.length === 0 ? 'outlined' : 'contained'}
-            disabled={uiStore.selectedApprovals.length === 0}
+            variant={hasSelectedApprobals ? 'contained' : 'outlined'}
+            disabled={!hasSelectedApprobals}
             size="large"
             onClick={() => setApprovalDialogOpen(true)}
           >

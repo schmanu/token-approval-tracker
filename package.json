@@ -33,11 +33,14 @@
     "test": "craco test",
     "eject": "craco eject",
     "generate-types": "typechain --target=ethers-v5 --out-dir src/contracts './node_modules/@openzeppelin/contracts/build/contracts/ERC20.json'",
-    "postinstall": "yarn generate-types"
+    "postinstall": "yarn generate-types",
+    "serve": "npx -y serve build -p 3001"
   },
   "browserslist": {
     "production": [
       ">0.2%",
+      "not ie <= 99",
+      "not android <= 4.4.4",
       "not dead",
       "not op_mini all"
     ],
